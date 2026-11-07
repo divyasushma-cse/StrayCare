@@ -167,6 +167,12 @@ node -e "console.log(require('crypto').randomBytes(48).toString('base64url'))"
 
 Set `NODE_ENV=production`, `JWT_SECRET`, `ADMIN_USERNAME`, and `ADMIN_PASSWORD` in the deployment environment. Use persistent storage for the SQLite database and uploads, restrict the service behind HTTPS, and do not run multiple application processes against the same database.
 
+### Deploy to Render
+
+The repository includes a Render Blueprint in [`render.yaml`](render.yaml). In Render, choose **New → Blueprint**, connect this GitHub repository, and review the service and persistent-disk plan before confirming. The Blueprint generates a JWT secret and asks you to provide a unique production administrator username and password. Add no `.env` file or demo data to the deployment.
+
+The persistent disk stores both SQLite and uploaded photos under `/var/data`. A disk-backed service requires a paid Render web-service plan; review the current price in Render before creating it. Keep the service to one instance while using SQLite.
+
 Create a consistent backup of the database and uploaded photos:
 
 ```bash

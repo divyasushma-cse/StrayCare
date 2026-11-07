@@ -5,6 +5,7 @@ StrayCare is a single Node.js process backed by SQLite and a local uploads direc
 ## Before deployment
 
 - Set `NODE_ENV=production`, a unique `JWT_SECRET`, a unique administrator username and a strong administrator password. Production startup rejects missing or placeholder credentials; never use values from `.env.example`.
+- For Render, use the repository's `render.yaml` Blueprint. It generates `JWT_SECRET`, prompts for `ADMIN_USERNAME` and `ADMIN_PASSWORD`, and mounts a persistent disk at `/var/data` for `DB_PATH` and `UPLOAD_DIR`. Review the current paid service/disk cost before confirming deployment; do not add a `.env` file or seed demo data.
 - Set `CORS_ORIGIN` to the exact trusted frontend origin(s). Terminate HTTPS at a trusted reverse proxy and do not expose the Node port directly to the public internet.
 - Use persistent storage for `DB_PATH` and `UPLOAD_DIR`. Run one application process per database because report-radius scheduling is process-local.
 - Do not run `npm run seed` in production. Keep `.env`, the database, backups, and uploads out of source control.
