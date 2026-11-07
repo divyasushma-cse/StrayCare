@@ -1,47 +1,164 @@
-# StrayCare — Rescue. Heal. Protect.
+<div align="center">
 
-Full-stack version of the single-file prototype: **Node/Express + SQLite** backend, modular **vanilla HTML/CSS/JS** frontend (original design preserved).
+# 🐾 StrayCare
 
-## Run
+### Rescue. Heal. Protect.
+
+A platform for reporting stray animals in need and coordinating a community response—from the first report to rescue and recovery.
+
+[Features](#-features) · [Get started](#-get-started) · [Testing](#-testing) · [Project structure](#-project-structure)
+
+</div>
+
+---
+
+## 🌟 About
+
+StrayCare connects people who report animals in need with responders and administrators who coordinate care. It includes a web frontend and a Node.js/Express API backed by SQLite.
+
+## ✨ Features
+
+- 📍 **Animal reports** — Submit a report with a typed address, optional GPS coordinates, description, and photo.
+- 🚑 **Responder dispatch** — Responders can find open cases, accept work, and update a case as it progresses.
+- 🔐 **Role-based access** — Reporter, responder, and administrator permissions are enforced by the backend.
+- 🖼️ **Protected report photos** — Photos are served through an authenticated route with report-level access checks.
+- 💝 **Donation tracking** — User confirmations create pending claims. Only an administrator who has reviewed external evidence can mark a claim verified.
+- 📊 **Analytics and exports** — View database-backed activity and generate supported reports and certificates.
+- 🧭 **Honest location handling** — Reports without GPS remain available in the dispatch pool, but are excluded from distance-based nearby results.
+- 🧪 **Isolated API smoke tests** — The smoke-test runner uses temporary database and upload paths instead of resetting local app data.
+
+## 🧰 Technology
+
+| Layer | Technologies |
+|---|---|
+| Frontend | HTML, CSS, vanilla JavaScript |
+| Backend | Node.js, Express |
+| Database | SQLite |
+| Authentication | bcrypt password hashing, JWT sessions |
+
+## 🚀 Get started
+
+### Requirements
+
+Install Node.js and npm before getting started.
+
+### 1. Clone the repository
+
+```bash
+git clone https://github.com/divyasushma-cse/StrayCare.git
+cd StrayCare
+```
+
+### 2. Install backend dependencies
+
 ```bash
 cd backend
 npm install
-cp .env.example .env        # replace the local placeholders before starting
-npm run seed                # local development/demo data only; never run in production
-npm start                   # http://localhost:5000  (serves the frontend too)
 ```
-Generate a signing secret locally with `node -e "console.log(require('crypto').randomBytes(48).toString('base64url'))"` and set it as `JWT_SECRET`; also set a unique `ADMIN_USERNAME` and an `ADMIN_PASSWORD` of at least 12 characters. Production startup rejects missing, default, placeholder, or too-short credentials. Demo seeding is explicitly disabled in production. Keep `.env` private and never deploy the example values.
 
-Seeded demo accounts (local development only): `user1/user123` · `vet1/vet123` · `ngo1/ngo123` · `vol1/vol123`; the initial admin uses `ADMIN_USERNAME` / `ADMIN_PASSWORD` from `.env`.
+### 3. Configure local environment
 
-Run the complete test suite with `cd backend && npm test`. Unit tests run without a server; the API smoke test seeds and starts an isolated temporary database/upload directory and cleans it up afterward, leaving `database/straycare.db` and `backend/uploads` untouched. Focused suites: `npm run test:security`, `npm run test:report-access`, `npm run test:donations`, and `npm run test:report-coordinates`. The browser E2E flow (`node scripts/e2e.js`) is separate, requires Playwright and a dedicated development server seeded with demo accounts; it does not run as part of `npm test`.
+Create your local environment file from the example.
 
-### Donations
-Donation confirmation records a **pending payment claim**, not verified funds. Payments happen outside StrayCare through the selected NGO's UPI destination; the app does not process or automatically verify transfers. An authenticated administrator must explicitly attest that external payment evidence was reviewed before a claim can be marked verified. The app records the admin user reference and verification timestamp. On upgrade, legacy claims marked verified without a recorded verifier are returned to pending review; older verified rows may have no timestamp because it was not previously captured. Donation exports count only admin-marked verified claims as verified funds and report pending claims separately.
+**Windows PowerShell:**
 
-Reports accept a typed address even when GPS is unavailable. Such reports store null coordinates, remain visible in the general dispatch pool, and are omitted from the responder Nearby-only filter because their distance cannot be calculated.
-
-## Structure
+```powershell
+Copy-Item .env.example .env
+notepad .env
 ```
+
+**macOS/Linux:**
+
+```bash
+cp .env.example .env
+```
+
+Review `.env.example` and set your local values in `.env`. Keep `.env` private; never commit it or use example credentials in a deployment. Generate a strong JWT signing secret locally with:
+
+```bash
+node -e "console.log(require('crypto').randomBytes(48).toString('base64url'))"
+```
+
+Set that value as `JWT_SECRET`, and configure a unique `ADMIN_USERNAME` and an `ADMIN_PASSWORD` of at least 12 characters. Production startup rejects missing or placeholder credentials.
+
+### 4. Seed local demo data and start the app
+
+```bash
+npm run seed
+npm start
+```
+
+Open [http://localhost:5000](http://localhost:5000).
+
+> **Local development only:** Demo seeding is refused in production. Do not run the seed script against production data.
+
+## 🧪 Testing
+
+From the `backend` directory, run the complete test suite:
+
+```bash
+npm test
+```
+
+The suite runs unit tests and an API smoke test. The smoke-test runner uses temporary database and upload paths and cleans them up afterward, leaving the normal local database and uploads untouched.
+
+Focused test commands:
+
+```bash
+npm run test:security
+npm run test:report-access
+npm run test:donations
+npm run test:report-coordinates
+npm run test:responder-lifecycle
+```
+
+The browser E2E flow is separate and requires Playwright plus a dedicated development server with demo data:
+
+```bash
+node scripts/e2e.js
+```
+
+## 🔒 Security and data integrity
+
+- **Production credentials:** Configure a strong, unique JWT secret and administrator credentials before deployment. Default and placeholder values are rejected.
+- **Report access:** Reporters can access their own reports and photos; administrators can access all reports; responders can access open dispatch cases and cases assigned to them.
+- **Donation status:** A user-submitted confirmation is a pending claim, not proof of payment. The app does not process or automatically verify payments.
+- **Location:** A typed address is supported when GPS is unavailable. Such reports have unknown coordinates and cannot be included in distance-based nearby filtering.
+- **Environment files:** Use `.env.example` as a reference. Never commit `.env` or put secrets in frontend files.
+
+## 🗂️ Project structure
+
+```text
 StrayCare/
-├── frontend/
-│   ├── index.html                  entry (redirects to pages/home.html)
-│   ├── pages/                      home, login, signup, user-/responder-/admin-dashboard
-│   ├── css/                        style, auth, dashboard, admin, responsive (split from original CSS)
-│   ├── js/                         config, api, ui, auth, home, user, responder, admin, charts, export, vendor/chart.js
-│   └── assets/{images,icons,fonts}
 ├── backend/
-│   ├── src/ config/ db/ middleware/ routes/ services/ utils/ app.js server.js
-│   ├── scripts/                    seed.js, e2e.js
-│   ├── uploads/                    report photos
-│   └── .env.example
-├── database/schema.sql             users, reports, report_events, donations
-└── docs/ANALYSIS.md               feature inventory + localStorage → API/DB map + defects found
+│   ├── scripts/       # Seed, unit, smoke, and E2E test scripts
+│   ├── src/
+│   │   ├── config/
+│   │   ├── db/
+│   │   ├── middleware/
+│   │   ├── routes/
+│   │   ├── services/
+│   │   └── utils/
+│   └── uploads/       # Runtime report photos
+├── database/
+│   └── schema.sql
+├── docs/
+├── frontend/
+│   ├── css/
+│   ├── js/
+│   ├── pages/
+│   └── index.html
+└── README.md
 ```
 
-## What changed vs. the prototype
-- Passwords hashed (bcrypt), JWT sessions, server-enforced roles; pending/banned admins can no longer log in.
-- Radius expansion runs on the server (survives reloads; timings in `.env`).
-- Analytics, hero stats, exports and certificate PDFs are computed from the database (no hard-coded demo numbers).
-- Responders can filter to "Nearby only" (haversine distance vs. current radius).
-- Photos are uploaded files (≤5 MB, images only); all user text is HTML-escaped.
+## 🤝 Contributing
+
+Issues and improvements are welcome. For changes involving authentication, report access, uploads, or donation verification, please include focused tests where practical.
+
+---
+
+<div align="center">
+
+**Built to help communities care for animals in need. 🐾**
+
+</div>
