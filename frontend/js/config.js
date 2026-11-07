@@ -1,2 +1,2 @@
-// Override before this script loads (window.STRAYCARE_API = 'https://host/api') when the API is on another origin.
-window.API_BASE = window.STRAYCARE_API || '/api';
+// Override before this script loads when deploying the frontend against another API.
+window.API_BASE = window.STRAYCARE_API || 'https://straycare-0d09.onrender.com/api';
