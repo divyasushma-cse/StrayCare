@@ -2,13 +2,10 @@ services:
   - type: web
     name: straycare
     runtime: node
+    plan: free
     buildCommand: cd backend && npm install
     startCommand: cd backend && npm start
     healthCheckPath: /api/health
-    disk:
-      name: straycare-data
-      mountPath: /var/data
-      sizeGB: 1
     envVars:
       - key: NODE_ENV
         value: production
@@ -19,6 +16,6 @@ services:
       - key: ADMIN_PASSWORD
         sync: false
       - key: DB_PATH
-        value: /var/data/straycare.db
+        value: /tmp/straycare/straycare.db
       - key: UPLOAD_DIR
-        value: /var/data/uploads
+        value: /tmp/straycare/uploads

@@ -1,5 +1,6 @@
 const assert = require('node:assert/strict');
 const { spawnSync } = require('node:child_process');
+const os = require('node:os');
 const path = require('node:path');
 const test = require('node:test');
 const { assertProductionConfig, assertDemoSeedAllowed } = require('../src/config/security');
@@ -47,6 +48,31 @@ test('production admin credentials come from the production environment', () => 
     password: validProductionConfig.adminPassword,
     name: 'Chief Admin'
   });
+});
+
+test('Render uses temporary storage and redirects the old persistent-disk paths', () => {
+  const env = {
+    ...process.env,
+    NODE_ENV: 'production',
+    STRAYCARE_SKIP_DOTENV: '1',
+    RENDER: 'true',
+    DB_PATH: '/var/data/straycare.db',
+    UPLOAD_DIR: '/var/data/uploads',
+    JWT_SECRET: validProductionConfig.jwtSecret,
+    ADMIN_USERNAME: validProductionConfig.adminUsername,
+    ADMIN_PASSWORD: validProductionConfig.adminPassword
+  };
+  const result = spawnSync(process.execPath, ['-e', "const e=require('./src/config/env');process.stdout.write(JSON.stringify({dbPath:e.dbPath,uploadDir:e.uploadDir}))"], {
+    cwd: path.join(__dirname, '..'),
+    env,
+    encoding: 'utf8'
+  });
+  assert.equal(result.status, 0);
+  assert.deepEqual(JSON.parse(result.stdout), {
+    dbPath: path.join(os.tmpdir(), 'straycare', 'straycare.db'),
+    uploadDir: path.join(os.tmpdir(), 'straycare', 'uploads')
+  });
+  assert.match(result.stderr, /ephemeral storage/);
 });
 
 test('accepts unique production credentials', () => {

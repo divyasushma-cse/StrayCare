@@ -165,13 +165,13 @@ Generate a signing secret locally:
 node -e "console.log(require('crypto').randomBytes(48).toString('base64url'))"
 ```
 
-Set `NODE_ENV=production`, `JWT_SECRET`, `ADMIN_USERNAME`, and `ADMIN_PASSWORD` in the deployment environment. Use persistent storage for the SQLite database and uploads, restrict the service behind HTTPS, and do not run multiple application processes against the same database.
+Set `NODE_ENV=production`, `JWT_SECRET`, `ADMIN_USERNAME`, and `ADMIN_PASSWORD` in the deployment environment. SQLite and uploaded photos need persistent storage for production use; restrict the service behind HTTPS and do not run multiple application processes against the same database.
 
 ### Deploy to Render
 
-The repository includes a Render Blueprint in [`render.yaml`](render.yaml). In Render, choose **New → Blueprint**, connect this GitHub repository, and review the service and persistent-disk plan before confirming. The Blueprint generates a JWT secret and asks you to provide a unique production administrator username and password. Add no `.env` file or demo data to the deployment.
+The repository includes a Render Blueprint in [`render.yaml`](render.yaml). In Render, choose **New → Blueprint**, connect this GitHub repository, and review the service plan before confirming. The Blueprint generates a JWT secret and asks you to provide a unique production administrator username and password. Add no `.env` file or demo data to the deployment.
 
-The persistent disk stores both SQLite and uploaded photos under `/var/data`. A disk-backed service requires a paid Render web-service plan; review the current price in Render before creating it. Keep the service to one instance while using SQLite.
+The Blueprint is configured for Render Free without an attached disk. It stores SQLite and uploaded photos under `/tmp/straycare`; the service can run without a disk, but this storage is temporary and data may be lost when Render restarts or redeploys the service. Do not use this configuration for real rescue reports or data that must be retained. For durable production use, configure a persistent disk and set `DB_PATH` and `UPLOAD_DIR` to paths on its mount. Keep the service to one instance while using SQLite.
 
 Create a consistent backup of the database and uploaded photos:
 
