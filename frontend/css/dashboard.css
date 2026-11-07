@@ -1,0 +1,458 @@
+/* ============ REPORT CARDS ============ */
+    .rcard {
+      background: var(--card);
+      border-radius: var(--r);
+      border: 0.5px solid var(--border);
+      padding: 1.25rem;
+      box-shadow: var(--shadow)
+    }
+
+    .rcard.critical {
+      border-left: 3px solid var(--red);
+      border-radius: 0 var(--r) var(--r) 0
+    }
+
+    .rcard.moderate {
+      border-left: 3px solid var(--amber);
+      border-radius: 0 var(--r) var(--r) 0
+    }
+
+    .rcard.mild {
+      border-left: 3px solid var(--g);
+      border-radius: 0 var(--r) var(--r) 0
+    }
+
+    .rcard+.rcard {
+      margin-top: 0.75rem
+    }
+
+    .rtitle {
+      font-size: 1rem;
+      font-weight: 600;
+      font-family: 'Playfair Display', serif
+    }
+
+    .rmeta {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      flex-wrap: wrap;
+      margin-top: 6px
+    }
+
+    
+/* ============ RADIUS BAR ============ */
+    .rbar {
+      margin-top: 10px
+    }
+
+    .rbar-lbl {
+      font-size: 11px;
+      color: var(--text2);
+      margin-bottom: 3px;
+      display: flex;
+      justify-content: space-between
+    }
+
+    .rbar-track {
+      height: 5px;
+      background: #ECEAE4;
+      border-radius: 3px;
+      overflow: hidden
+    }
+
+    .rbar-fill {
+      height: 100%;
+      border-radius: 3px;
+      transition: width 1.2s ease;
+      background: var(--g)
+    }
+
+    .rbar-fill.urg {
+      background: var(--red)
+    }
+
+    
+/* ============ TIMELINE ============ */
+    .tl {
+      list-style: none
+    }
+
+    .tl li {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      padding: 9px 0
+    }
+
+    .tl li+li {
+      border-top: 0.5px solid var(--border)
+    }
+
+    .tl-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: #ECEAE4;
+      border: 2px solid var(--text3);
+      margin-top: 5px;
+      flex-shrink: 0
+    }
+
+    .tl-dot.done {
+      background: var(--g);
+      border-color: var(--g2)
+    }
+
+    .tl-txt {
+      font-size: 13px;
+      color: var(--text2)
+    }
+
+    .tl-txt strong {
+      color: var(--text);
+      display: block;
+      font-size: 13.5px
+    }
+
+    
+/* ============ PULSE ============ */
+    @keyframes pulse {
+
+      0%,
+      100% {
+        opacity: 1
+      }
+
+      50% {
+        opacity: 0.45
+      }
+    }
+
+    .pulse {
+      animation: pulse 1.6s infinite
+    }
+
+    
+/* ============ PHOTO ============ */
+    .photo-ph {
+      width: 100%;
+      height: 140px;
+      border-radius: var(--r-sm);
+      background: #ECEAE4;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      cursor: pointer;
+      border: 2px dashed var(--border2);
+      font-size: 13px;
+      color: var(--text2);
+      transition: background 0.2s
+    }
+
+    .photo-ph:hover {
+      background: #E4E2DC
+    }
+
+    .photo-prev {
+      width: 100%;
+      height: 140px;
+      border-radius: var(--r-sm);
+      object-fit: cover;
+      display: block;
+      margin-top: 8px
+    }
+
+    
+/* ============ SEVERITY SELECT ============ */
+    .sev-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+      margin-top: 4px
+    }
+
+    .sev-opt {
+      padding: 10px 8px;
+      border-radius: 10px;
+      border: 1.5px solid var(--border2);
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.2s
+    }
+
+    .sev-opt:hover {
+      border-color: var(--g)
+    }
+
+    .sev-opt.sel-critical {
+      background: var(--red-l);
+      border-color: var(--red)
+    }
+
+    .sev-opt.sel-moderate {
+      background: var(--amber-l);
+      border-color: var(--amber)
+    }
+
+    .sev-opt.sel-mild {
+      background: var(--g3);
+      border-color: var(--g)
+    }
+
+    .sev-icon {
+      font-size: 22px
+    }
+
+    .sev-name {
+      font-size: 13px;
+      font-weight: 600;
+      margin-top: 3px
+    }
+
+    .sev-desc {
+      font-size: 11px;
+      color: var(--text2)
+    }
+
+    
+/* ============ MAP SIM ============ */
+    .map-sim {
+      width: 100%;
+      height: 190px;
+      background: linear-gradient(135deg, #ddf0ea 0%, #c5def5 100%);
+      border-radius: var(--r-sm);
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center
+    }
+
+    .map-pin {
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 11px;
+      position: absolute;
+      border: 2px solid #fff;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2)
+    }
+
+    .map-pin.user-pin {
+      background: var(--blue)
+    }
+
+    .map-pin.resp-pin {
+      background: var(--g)
+    }
+
+    .map-pin.inc-pin {
+      background: var(--coral);
+      z-index: 2
+    }
+
+    .map-lbl {
+      font-size: 10px;
+      position: absolute;
+      background: rgba(255, 255, 255, 0.9);
+      padding: 2px 7px;
+      border-radius: 10px;
+      white-space: nowrap;
+      top: 26px;
+      left: 50%;
+      transform: translateX(-50%)
+    }
+
+    .rad-circle {
+      position: absolute;
+      border-radius: 50%;
+      border: 2px dashed;
+      opacity: 0.35;
+      transform: translate(-50%, -50%)
+    }
+
+    
+/* ============ UPI MODAL ============ */
+    .upi-box {
+      text-align: center;
+      padding: 0.5rem 0
+    }
+
+    .upi-qr-wrap {
+      width: 160px;
+      height: 160px;
+      margin: 0 auto 1rem;
+      background: #fff;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 10px
+    }
+
+    .upi-id-display {
+      background: var(--g3);
+      border-radius: 8px;
+      padding: 10px;
+      font-family: monospace;
+      font-size: 14px;
+      color: var(--g2);
+      margin-bottom: 1rem;
+      word-break: break-all
+    }
+
+    .upi-steps {
+      text-align: left;
+      font-size: 13px;
+      color: var(--text2);
+      margin-bottom: 1rem
+    }
+
+    .upi-steps li {
+      padding: 4px 0
+    }
+
+    .upi-confirm-btn {
+      background: var(--g);
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      padding: 11px 24px;
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      width: 100%
+    }
+
+    .upi-confirm-btn:hover {
+      background: var(--g2)
+    }
+
+    
+/* ============ RESPONDER CARDS ============ */
+    .req-card {
+      background: var(--card);
+      border-radius: var(--r);
+      border: 0.5px solid var(--border);
+      padding: 1.25rem;
+      box-shadow: var(--shadow)
+    }
+
+    .req-card.crit-req {
+      border-color: var(--red);
+      box-shadow: 0 0 0 2px rgba(226, 75, 74, 0.12)
+    }
+
+    .req-card+.req-card {
+      margin-top: 0.75rem
+    }
+
+    
+/* ============ ANALYTICS ============ */
+    .chart-wrap {
+      position: relative;
+      width: 100%
+    }
+
+    .legend-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-bottom: 10px;
+      font-size: 12px;
+      color: var(--text2)
+    }
+
+    .leg-item {
+      display: flex;
+      align-items: center;
+      gap: 5px
+    }
+
+    .leg-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 2px;
+      flex-shrink: 0
+    }
+
+    .bar-row-h {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 8px;
+      font-size: 13px
+    }
+
+    .bar-lbl {
+      width: 64px;
+      color: var(--text2);
+      text-align: right;
+      flex-shrink: 0
+    }
+
+    .bar-track {
+      flex: 1;
+      height: 10px;
+      background: #ECEAE4;
+      border-radius: 5px;
+      overflow: hidden
+    }
+
+    .bar-fill {
+      height: 100%;
+      border-radius: 5px;
+      transition: width 0.7s ease
+    }
+
+    .bar-val {
+      width: 30px;
+      color: var(--text);
+      font-weight: 500;
+      flex-shrink: 0
+    }
+
+    .insight-r {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 8px 0;
+      border-bottom: 0.5px solid var(--border);
+      font-size: 13px
+    }
+
+    .insight-r:last-child {
+      border-bottom: none
+    }
+
+    
+/* ============ DONATION ============ */
+    .donate-amts {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 8px;
+      margin-bottom: 12px
+    }
+
+    
+/* ============ REWARDS ============ */
+    .milestone-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 10px 0;
+      border-bottom: 0.5px solid var(--border)
+    }
+
+    .milestone-row:last-child {
+      border-bottom: none
+    }
+
+    

@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>StrayCare — Admin Command Centre</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <script src="../js/vendor/chart.umd.js"></script>
+  <link rel="stylesheet" href="../css/style.css">
+  <link rel="stylesheet" href="../css/dashboard.css">
+  <link rel="stylesheet" href="../css/admin.css">
+  <link rel="stylesheet" href="../css/responsive.css">
+</head>
+<body>
+  <div id="topbar"></div>
+  <div id="notif"><div class="notif-inner" id="notif-inner"></div></div>
+  <div class="modal-ov" id="modal-ov" onclick="closeModal(event)"><div class="modal-box" id="modal-box"></div></div>
+  <div class="page active" id="page-admin">
+    <div class="container">
+
+      <!-- ADMIN HERO HEADER -->
+      <div class="adm-hero">
+        <div class="adm-hero-left">
+          <h2>⚙️ Command Centre</h2>
+          <p id="adm-hero-sub">Welcome back — full system access granted</p>
+        </div>
+        <div class="adm-hero-right">
+          <span class="adm-role-badge" id="adm-badge">⚡ Admin</span>
+          <span class="adm-clock" id="adm-clock">--:--:--</span>
+        </div>
+      </div>
+
+      <!-- TAB ROW -->
+      <div class="tab-row" style="overflow-x:auto;white-space:nowrap;padding-bottom:4px;width:100%;border-radius:10px">
+        <button class="tpill active" onclick="switchSub('admin','live',this)">🔴 Live Feed</button>
+        <button class="tpill" onclick="switchSub('admin','dispatch',this)" style="color:var(--red);font-weight:600">⚡ Dispatch Center</button>
+        <button class="tpill" onclick="switchSub('admin','users',this)" style="color:var(--amber-d);font-weight:600">🛡️ Access Control</button>
+        <button class="tpill" onclick="switchSub('admin','weekly',this)">📅 Weekly</button>
+        <button class="tpill" onclick="switchSub('admin','monthly',this)">📆 Monthly</button>
+        <button class="tpill" onclick="switchSub('admin','breakdown',this)">📊 Data</button>
+        <button class="tpill" onclick="switchSub('admin','export',this)" style="color:var(--blue);font-weight:600">📤 Export</button>
+      </div>
+
+      <!-- LIVE -->
+      <div class="subtab active" id="admin-live">
+
+        <!-- KPI Cards -->
+        <div class="adm-kpi-grid">
+          <div class="adm-kpi kpi-total">
+            <div class="adm-kpi-icon">📋</div>
+            <div class="adm-kpi-body">
+              <div class="adm-kpi-num" id="adm-total">0</div>
+              <div class="adm-kpi-lbl">Total Reports</div>
+              <div class="adm-kpi-sub" style="color:var(--blue)" id="adm-total-d"></div>
+            </div>
+          </div>
+          <div class="adm-kpi kpi-active">
+            <div class="adm-kpi-icon">🔄</div>
+            <div class="adm-kpi-body">
+              <div class="adm-kpi-num" id="adm-active">0</div>
+              <div class="adm-kpi-lbl">Active Cases</div>
+              <div class="adm-kpi-sub" style="color:var(--amber)">In progress</div>
+            </div>
+          </div>
+          <div class="adm-kpi kpi-rescued">
+            <div class="adm-kpi-icon">🐾</div>
+            <div class="adm-kpi-body">
+              <div class="adm-kpi-num" id="adm-rescued">0</div>
+              <div class="adm-kpi-lbl">Rescued</div>
+              <div class="adm-kpi-sub" style="color:var(--g)">Successfully rescued</div>
+            </div>
+          </div>
+          <div class="adm-kpi kpi-critical">
+            <div class="adm-kpi-icon">🚨</div>
+            <div class="adm-kpi-body">
+              <div class="adm-kpi-num" id="adm-critical">0</div>
+              <div class="adm-kpi-lbl">Critical</div>
+              <div class="adm-kpi-sub" style="color:var(--red)">Needs priority</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- System Status Bar -->
+        <div class="adm-status-bar">
+          <div class="adm-status-item">
+            <div class="adm-status-dot green pulse"></div>
+            <span><strong style="color:var(--text)">System Operational</strong></span>
+          </div>
+          <div class="adm-status-item">
+            <div class="adm-status-dot green"></div>
+            <span>Open cases: <strong id="adm-status-open-n" style="color:var(--text)">0</strong></span>
+          </div>
+          <div class="adm-status-item">
+            <div class="adm-status-dot green"></div>
+            <span>Dispatch: <strong style="color:var(--text)">Auto</strong></span>
+          </div>
+          <div class="adm-status-item" style="margin-left:auto;font-size:11.5px;color:var(--text3)">
+            Last refresh: <span id="adm-last-refresh">--</span>
+          </div>
+        </div>
+
+        <!-- Critical Cases -->
+        <div class="card" style="margin-bottom:1rem">
+          <div class="card-title" style="color:var(--red);display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+            <span class="pulse">🔴</span> Critical Cases
+            <span class="badge b-critical" id="adm-crit-count" style="font-size:11px;padding:2px 8px">0</span>
+            <span style="margin-left:auto;font-size:12px;font-weight:400;color:var(--text2)">Priority — immediate action required</span>
+          </div>
+          <div id="adm-crits"></div>
+        </div>
+
+        <!-- All Cases -->
+        <div class="card">
+          <div class="card-title" style="display:flex;align-items:center;gap:8px">
+            📑 All Active Cases
+            <span style="margin-left:auto">
+              <span class="badge b-reported" id="adm-all-count" style="font-size:11px;padding:2px 8px">0 total</span>
+            </span>
+          </div>
+          <div id="adm-all"></div>
+        </div>
+      </div>
+
+      <!-- DISPATCH CENTER -->
+      <div class="subtab" id="admin-dispatch">
+        <div class="card" style="margin-bottom:1rem">
+          <div class="adm-section-chip chip-red">
+            <span class="chip-icon">⚡</span>
+            Force Dispatch — Override Assignment
+            <span class="chip-badge" style="background:rgba(226,75,74,0.15);color:var(--red-d)">ADMIN POWER</span>
+          </div>
+          <p style="font-size:13px;color:var(--text2);margin:-0.25rem 0 1rem">Manually assign any rescue unit to an open case, bypassing the auto radius system.</p>
+          <div id="adm-override-list"><p style="font-size:13px;color:var(--text2)">No open cases to dispatch.</p></div>
+        </div>
+        <div class="card" style="margin-bottom:1rem">
+          <div class="adm-section-chip chip-coral">
+            <span class="chip-icon">🗑️</span>
+            Spam &amp; False Report Control
+            <span class="chip-badge" style="background:rgba(216,90,48,0.12);color:var(--coral-d)">MODERATION</span>
+          </div>
+          <p style="font-size:13px;color:var(--text2);margin:-0.25rem 0 1rem">Permanently remove reports flagged as false or abusive submissions.</p>
+          <div id="adm-spam-list"><p style="font-size:13px;color:var(--text2)">No reports to moderate.</p></div>
+        </div>
+        <div class="card">
+          <div class="adm-section-chip chip-green">
+            <span class="chip-icon">💳</span>
+            Donation Verification Ledger
+            <span class="chip-badge" style="background:rgba(29,158,117,0.12);color:var(--g2)">FINANCE</span>
+          </div>
+          <p style="font-size:13px;color:var(--text2);margin:-0.25rem 0 1rem">Review incoming donations and mark them verified once bank transfer is confirmed.</p>
+          <div id="adm-donation-verify"><p style="font-size:13px;color:var(--text2)">All donations verified!</p></div>
+        </div>
+      </div>
+
+      <!-- ACCESS MANAGEMENT -->
+      <div class="subtab" id="admin-users">
+        <div class="card" style="margin-bottom:1rem">
+          <div class="adm-section-chip chip-amber">
+            <span class="chip-icon">⏳</span>
+            Pending Approval Queue
+            <span class="chip-badge" style="background:rgba(186,117,23,0.12);color:var(--amber-d)">REVIEW REQUIRED</span>
+          </div>
+          <p style="font-size:13px;color:var(--text2);margin:-0.25rem 0 1rem">Newly registered admin accounts awaiting verification. Approve or permanently reject.</p>
+          <div id="adm-pending-users"><p style="font-size:13px;color:var(--text2)">No pending accounts.</p></div>
+        </div>
+        <div class="card">
+          <div class="adm-section-chip chip-blue">
+            <span class="chip-icon">🛡️</span>
+            Active User Management
+            <span class="chip-badge" style="background:rgba(24,95,165,0.12);color:var(--blue)">BAN / REVOKE</span>
+          </div>
+          <p style="font-size:13px;color:var(--text2);margin:-0.25rem 0 1rem">All registered responders and admins. Revoke or ban system access instantly.</p>
+          <div id="adm-active-responders"><p style="font-size:13px;color:var(--text2)">No active custom users in DB.</p></div>
+        </div>
+      </div>
+
+      <!-- WEEKLY -->
+      <div class="subtab" id="admin-weekly">
+
+        <!-- Section header -->
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1.1rem;flex-wrap:wrap;gap:8px">
+          <div>
+            <div style="font-size:1.1rem;font-family:'Playfair Display',serif;font-weight:700;color:var(--text)">📅 This Week's Overview</div>
+            <div style="font-size:12px;color:var(--text2);margin-top:2px">Mon–Sun · Live aggregation</div>
+          </div>
+          <span style="font-size:12px;background:var(--g3);color:var(--g2);padding:4px 12px;border-radius:20px;font-weight:600">Current Week</span>
+        </div>
+
+        <div class="adm-kpi-grid" id="wk-kpis" style="margin-bottom:1.1rem"></div>
+
+        <!-- Activity Heatmap Strip -->
+        <div class="card" style="margin-bottom:1rem">
+          <div class="card-title" style="display:flex;align-items:center;gap:8px">
+            🌡️ Daily Activity Heatmap
+            <span style="font-size:12px;font-weight:400;color:var(--text2);margin-left:auto">This week — cases by day</span>
+          </div>
+          <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:8px;margin-top:4px" id="wk-heatmap">
+            <!-- Rendered by JS -->
+          </div>
+          <div style="display:flex;align-items:center;gap:6px;margin-top:10px;font-size:11px;color:var(--text3)">
+            <span>Less</span>
+            <span style="display:inline-block;width:14px;height:14px;border-radius:3px;background:#ECEAE4"></span>
+            <span style="display:inline-block;width:14px;height:14px;border-radius:3px;background:rgba(29,158,117,0.25)"></span>
+            <span style="display:inline-block;width:14px;height:14px;border-radius:3px;background:rgba(29,158,117,0.55)"></span>
+            <span style="display:inline-block;width:14px;height:14px;border-radius:3px;background:var(--g)"></span>
+            <span>More</span>
+          </div>
+        </div>
+
+        <!-- Main trend chart -->
+        <div class="card" style="margin-bottom:1rem">
+          <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:0.75rem;flex-wrap:wrap;gap:8px">
+            <div>
+              <div class="card-title" style="margin-bottom:3px">📈 Daily Rescue Trend</div>
+              <div style="font-size:12px;color:var(--text2)">Rescued vs Critical vs Reports — Mon to Sun</div>
+            </div>
+            <div class="legend-row" style="margin-bottom:0">
+              <span class="leg-item"><span class="leg-dot" style="background:#1D9E75"></span>Rescued</span>
+              <span class="leg-item"><span class="leg-dot" style="background:#E24B4A"></span>Critical</span>
+              <span class="leg-item"><span class="leg-dot" style="background:#BA7517"></span>Reports</span>
+            </div>
+          </div>
+          <div class="chart-wrap" style="height:220px"><canvas id="wk-line"></canvas></div>
+        </div>
+
+        <!-- Grid: Severity + Response -->
+        <div class="grid2" style="margin-bottom:1rem">
+          <div class="card">
+            <div class="card-title" style="margin-bottom:4px">🥧 Severity Split</div>
+            <div style="font-size:12px;color:var(--text2);margin-bottom:10px">% of this week's total cases</div>
+            <div class="chart-wrap" style="height:180px"><canvas id="wk-sev"></canvas></div>
+          </div>
+          <div class="card">
+            <div class="card-title" style="margin-bottom:4px">⏱️ Response Time (min)</div>
+            <div style="font-size:12px;color:var(--text2);margin-bottom:10px">Faster is better — red bars &gt;18 min need review</div>
+            <div class="chart-wrap" style="height:180px"><canvas id="wk-resp"></canvas></div>
+          </div>
+        </div>
+
+        <!-- Animal type distribution + highlights -->
+        <div class="grid2">
+          <div class="card">
+            <div class="card-title" style="margin-bottom:4px">🐾 Animal Type Distribution</div>
+            <div style="font-size:12px;color:var(--text2);margin-bottom:10px">By number of cases this week</div>
+            <div id="wk-animals"></div>
+          </div>
+          <div class="card">
+            <div class="card-title" style="margin-bottom:10px">⭐ Week Highlights</div>
+            <div style="display:flex;flex-direction:column;gap:8px" id="wk-highlights"></div>
+          </div>
+        </div>
+      </div>
+
+
+      <!-- MONTHLY -->
+      <div class="subtab" id="admin-monthly">
+
+        <!-- Section header -->
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1.1rem;flex-wrap:wrap;gap:8px">
+          <div>
+            <div style="font-size:1.1rem;font-family:'Playfair Display',serif;font-weight:700;color:var(--text)">📆 12-Month Performance</div>
+            <div style="font-size:12px;color:var(--text2);margin-top:2px"><span id="mo-range">—</span> · Year-over-year analysis</div>
+          </div>
+          <span style="font-size:12px;background:var(--blue-l);color:var(--blue);padding:4px 12px;border-radius:20px;font-weight:600"><span id="mo-yoy">—</span></span>
+        </div>
+
+        <div class="adm-kpi-grid" id="mo-kpis" style="margin-bottom:1.1rem"></div>
+
+        <!-- Trend chart -->
+        <div class="card" style="margin-bottom:1rem">
+          <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:0.75rem;flex-wrap:wrap;gap:8px">
+            <div>
+              <div class="card-title" style="margin-bottom:3px">📈 12-Month Rescue Trend</div>
+              <div style="font-size:12px;color:var(--text2)">Rescued · Critical · Total Reports — monthly breakout</div>
+            </div>
+            <div class="legend-row" style="margin-bottom:0">
+              <span class="leg-item"><span class="leg-dot" style="background:#1D9E75"></span>Rescued</span>
+              <span class="leg-item"><span class="leg-dot" style="background:#E24B4A"></span>Critical</span>
+              <span class="leg-item"><span class="leg-dot" style="background:#85B7EB"></span>Reports</span>
+            </div>
+          </div>
+          <div class="chart-wrap" style="height:240px"><canvas id="mo-line"></canvas></div>
+        </div>
+
+        <div class="grid2">
+          <div class="card">
+            <div class="card-title" style="margin-bottom:4px">📊 Month-over-Month Growth</div>
+            <div style="font-size:12px;color:var(--text2);margin-bottom:10px">% change vs previous month (green = growth)</div>
+            <div class="chart-wrap" style="height:200px"><canvas id="mo-growth"></canvas></div>
+          </div>
+          <div class="card">
+            <div class="card-title" style="margin-bottom:10px">🏆 Top Rescue Months</div>
+            <div id="mo-top" style="margin-top:4px"></div>
+          </div>
+        </div>
+      </div>
+
+
+      <!-- BREAKDOWN -->
+      <div class="subtab" id="admin-breakdown">
+
+        <!-- Section header -->
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1.1rem;flex-wrap:wrap;gap:8px">
+          <div>
+            <div style="font-size:1.1rem;font-family:'Playfair Display',serif;font-weight:700;color:var(--text)">📊 Deep Data Breakdown</div>
+            <div style="font-size:12px;color:var(--text2);margin-top:2px">Outcome analytics · Responder share · Radius behaviour</div>
+          </div>
+        </div>
+
+        <div id="bd-top" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:0.75rem;margin-bottom:1rem"></div>
+
+        <!-- Stacked bar chart -->
+        <div class="card" style="margin-bottom:1rem">
+          <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:0.75rem;flex-wrap:wrap;gap:8px">
+            <div>
+              <div class="card-title" style="margin-bottom:3px">🐾 Rescue Outcomes by Animal Type</div>
+              <div style="font-size:12px;color:var(--text2)">Rescued vs Under treatment vs Critical pending</div>
+            </div>
+            <div class="legend-row" style="margin-bottom:0">
+              <span class="leg-item"><span class="leg-dot" style="background:#1D9E75"></span>Rescued</span>
+              <span class="leg-item"><span class="leg-dot" style="background:#BA7517"></span>Under treatment</span>
+              <span class="leg-item"><span class="leg-dot" style="background:#E24B4A"></span>Critical pending</span>
+            </div>
+          </div>
+          <div class="chart-wrap" style="height:260px"><canvas id="bd-stacked"></canvas></div>
+        </div>
+
+        <div class="grid2" style="margin-bottom:1rem">
+          <div class="card">
+            <div class="card-title" style="margin-bottom:4px">🍩 Responder Type Share</div>
+            <div style="font-size:12px;color:var(--text2);margin-bottom:10px">Which team type handles most rescues</div>
+            <div class="chart-wrap" style="height:200px"><canvas id="bd-donut"></canvas></div>
+          </div>
+          <div class="card">
+            <div class="card-title" style="margin-bottom:10px">🔍 Key Insights</div>
+            <div id="bd-insights" style="margin-top:4px"></div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:0.75rem;flex-wrap:wrap;gap:8px">
+            <div>
+              <div class="card-title" style="margin-bottom:3px">📡 Radius Expansion Events — by Severity</div>
+              <div style="font-size:12px;color:var(--text2)">How many times the search radius had to expand before acceptance</div>
+            </div>
+            <div class="legend-row" style="margin-bottom:0">
+              <span class="leg-item"><span class="leg-dot" style="background:#E24B4A"></span>Critical</span>
+              <span class="leg-item"><span class="leg-dot" style="background:#BA7517"></span>Moderate</span>
+              <span class="leg-item"><span class="leg-dot" style="background:#1D9E75"></span>Mild</span>
+            </div>
+          </div>
+          <div class="chart-wrap" style="height:180px"><canvas id="bd-radius"></canvas></div>
+        </div>
+      </div>
+
+      <!-- EXPORT CENTER -->
+      <div class="subtab" id="admin-export">
+
+        <!-- Header -->
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1.25rem;flex-wrap:wrap;gap:8px">
+          <div>
+            <div style="font-size:1.1rem;font-family:'Playfair Display',serif;font-weight:700;color:var(--text)">📤 Export &amp; Data Centre</div>
+            <div style="font-size:12px;color:var(--text2);margin-top:2px">Select what you want to export, then choose your format</div>
+          </div>
+          <span id="exp-snap-time" style="font-size:12px;background:var(--blue-l);color:var(--blue);padding:4px 12px;border-radius:20px;font-weight:600">Live data</span>
+        </div>
+
+        <!-- STEP 1: Category Selector -->
+        <div class="card" style="margin-bottom:1rem">
+          <div class="card-title" style="margin-bottom:0.85rem">
+            Step 1 — What do you want to export?
+          </div>
+          <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:0.65rem" id="exp-cat-grid">
+
+            <div class="exp-cat-card" id="cat-weekly" onclick="selectExportCat('weekly',this)"
+              style="border-radius:10px;padding:14px 10px;text-align:center;cursor:pointer;border:2px solid var(--border);background:var(--bg);transition:all 0.2s">
+              <div style="font-size:1.6rem;margin-bottom:6px">📅</div>
+              <div style="font-size:13px;font-weight:700;color:var(--text)">Weekly Report</div>
+              <div style="font-size:11px;color:var(--text2);margin-top:2px">This week's data</div>
+            </div>
+
+            <div class="exp-cat-card" id="cat-monthly" onclick="selectExportCat('monthly',this)"
+              style="border-radius:10px;padding:14px 10px;text-align:center;cursor:pointer;border:2px solid var(--border);background:var(--bg);transition:all 0.2s">
+              <div style="font-size:1.6rem;margin-bottom:6px">📆</div>
+              <div style="font-size:13px;font-weight:700;color:var(--text)">Monthly Report</div>
+              <div style="font-size:11px;color:var(--text2);margin-top:2px">12-month analytics</div>
+            </div>
+
+            <div class="exp-cat-card" id="cat-analytics" onclick="selectExportCat('analytics',this)"
+              style="border-radius:10px;padding:14px 10px;text-align:center;cursor:pointer;border:2px solid var(--border);background:var(--bg);transition:all 0.2s">
+              <div style="font-size:1.6rem;margin-bottom:6px">📊</div>
+              <div style="font-size:13px;font-weight:700;color:var(--text)">Analytics / Data</div>
+              <div style="font-size:11px;color:var(--text2);margin-top:2px">Breakdown insights</div>
+            </div>
+
+            <div class="exp-cat-card" id="cat-donations" onclick="selectExportCat('donations',this)"
+              style="border-radius:10px;padding:14px 10px;text-align:center;cursor:pointer;border:2px solid var(--border);background:var(--bg);transition:all 0.2s">
+              <div style="font-size:1.6rem;margin-bottom:6px">💳</div>
+              <div style="font-size:13px;font-weight:700;color:var(--text)">Donations</div>
+              <div style="font-size:11px;color:var(--text2);margin-top:2px">Finance records</div>
+            </div>
+
+            <div class="exp-cat-card" id="cat-full" onclick="selectExportCat('full',this)"
+              style="border-radius:10px;padding:14px 10px;text-align:center;cursor:pointer;border:2px solid var(--border);background:var(--bg);transition:all 0.2s">
+              <div style="font-size:1.6rem;margin-bottom:6px">🗂️</div>
+              <div style="font-size:13px;font-weight:700;color:var(--text)">Full Platform</div>
+              <div style="font-size:11px;color:var(--text2);margin-top:2px">Everything at once</div>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- STEP 2: Format Panel (shown after selection) -->
+        <div id="exp-format-panel" style="display:none">
+          <div class="card" style="margin-bottom:1rem">
+            <div style="display:flex;align-items:center;gap:10px;margin-bottom:0.85rem;flex-wrap:wrap">
+              <div class="card-title" style="flex:1">Step 2 — Choose your format</div>
+              <span id="exp-sel-label" style="font-size:12px;background:var(--g3);color:var(--g2);padding:3px 10px;border-radius:20px;font-weight:600"></span>
+            </div>
+
+            <!-- Format buttons row -->
+            <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px" id="exp-format-grid">
+              <!-- Filled by JS -->
+            </div>
+          </div>
+
+          <!-- Mini summary + preview -->
+          <div class="card">
+            <div class="card-title" style="display:flex;align-items:center;gap:8px;margin-bottom:0.75rem">
+              👁️ Preview — <span id="exp-preview-lbl" style="font-weight:400;color:var(--text2)"></span>
+            </div>
+            <div id="exp-summary-chips" style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:0.8rem"></div>
+            <pre id="exp-preview" style="font-size:11.5px;background:var(--bg);border-radius:8px;padding:1rem;overflow-x:auto;color:var(--text2);max-height:200px;overflow-y:auto;border:0.5px solid var(--border);line-height:1.6">Select a category above to preview data…</pre>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+  <script src="../js/config.js"></script>
+  <script src="../js/api.js"></script>
+  <script src="../js/ui.js"></script>
+  <script src="../js/charts.js"></script>
+  <script src="../js/export.js"></script>
+  <script src="../js/admin.js"></script>
+</body>
+</html>

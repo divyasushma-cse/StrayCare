@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>StrayCare — Rescue. Heal. Protect.</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/style.css">
+  <link rel="stylesheet" href="../css/responsive.css">
+</head>
+<body>
+  <div id="topbar"></div>
+  <div id="notif"><div class="notif-inner" id="notif-inner"></div></div>
+  <div class="modal-ov" id="modal-ov" onclick="closeModal(event)"><div class="modal-box" id="modal-box"></div></div>
+  <div class="page active" id="page-home">
+    <div class="hero">
+      <div class="hero-bg-dots"></div>
+      <h1>Every stray animal<br>deserves <em>rescue</em></h1>
+      <p>StrayCare connects injured and stray animals with NGOs, vets, and volunteers — instantly. Our smart dispatch
+        finds help before it's too late.</p>
+      <div class="hero-btns">
+        <button class="hero-btn-p" onclick="goLogin('user')">🐾 Report an
+          Animal</button>
+        <button class="hero-btn-s" onclick="goLogin('responder')">Join as
+          Responder</button>
+      </div>
+      <div class="stats-row">
+        <div class="stat-hero">
+          <div class="stat-hero-n" id="hero-total">0</div>
+          <div class="stat-hero-l">Reports Today</div>
+        </div>
+        <div class="stat-hero">
+          <div class="stat-hero-n" id="hero-rescued">0</div>
+          <div class="stat-hero-l">Rescued</div>
+        </div>
+        <div class="stat-hero">
+          <div class="stat-hero-n" id="hero-resp">0</div>
+          <div class="stat-hero-l">Responders</div>
+        </div>
+      </div>
+    </div>
+    <div class="features-grid">
+      <div class="feat-card">
+        <div class="feat-icon">🚨</div>
+        <div class="feat-title">Smart Dispatch</div>
+        <div class="feat-desc">Automatically expands search radius until a responder accepts. Critical cases get
+          priority with larger starting radius.</div>
+      </div>
+      <div class="feat-card">
+        <div class="feat-icon">📍</div>
+        <div class="feat-title">Live Tracking</div>
+        <div class="feat-desc">Real-time status updates from report to rescue. Know exactly where things stand every
+          step of the way.</div>
+      </div>
+      <div class="feat-card">
+        <div class="feat-icon">⭐</div>
+        <div class="feat-title">Reward Points</div>
+        <div class="feat-desc">Earn points for every valid rescue report. Unlock appreciation certificates at milestone
+          levels.</div>
+      </div>
+      <div class="feat-card">
+        <div class="feat-icon">❤️</div>
+        <div class="feat-title">Direct Donations</div>
+        <div class="feat-desc">Support verified NGOs and rescue funds directly. Every rupee goes toward animal welfare
+          operations.</div>
+      </div>
+      <div class="feat-card">
+        <div class="feat-icon">🏥</div>
+        <div class="feat-title">Vet Network</div>
+        <div class="feat-desc">Connected to mobile vets, clinics, and animal hospitals for immediate medical attention
+          after rescue.</div>
+      </div>
+      <div class="feat-card">
+        <div class="feat-icon">📊</div>
+        <div class="feat-title">Analytics Dashboard</div>
+        <div class="feat-desc">Weekly and monthly rescue analytics for admins — track trends, response times, and animal
+          type breakdowns.</div>
+      </div>
+    </div>
+  </div>
+  <script src="../js/config.js"></script>
+  <script src="../js/api.js"></script>
+  <script src="../js/ui.js"></script>
+  <script src="../js/home.js"></script>
+</body>
+</html>

@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>StrayCare — Sign In</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/style.css"><link rel="stylesheet" href="../css/auth.css"><link rel="stylesheet" href="../css/responsive.css">
+</head><body>
+  <div id="auth-overlay"><div class="auth-box">
+    <div class="auth-header"><div class="brand" onclick="location.href='home.html'" style="cursor:pointer">Stray<em>Care</em></div><p>Rescue. Heal. Protect.</p></div>
+    <div class="auth-body">
+      <div id="auth-step1">
+        <div class="auth-title">Welcome</div><div class="auth-sub">Select your role to get started</div>
+        <div class="role-grid">
+          <div class="role-opt" data-role="user" onclick="selectRole(this)"><div class="role-icon">🙋</div><div class="role-name">User</div><div class="role-hint">Report animals</div></div>
+          <div class="role-opt" data-role="responder" onclick="selectRole(this)"><div class="role-icon">🏥</div><div class="role-name">Responder</div><div class="role-hint">Vet / NGO / Volunteer</div></div>
+          <div class="role-opt" data-role="admin" onclick="selectRole(this)"><div class="role-icon">⚙️</div><div class="role-name">Admin</div><div class="role-hint">Website management</div></div>
+        </div>
+        <div class="auth-err" id="auth-err-role">Please select a role to continue.</div>
+        <button class="btn btn-primary btn-block" onclick="proceedToLogin()">Continue →</button>
+        <button class="btn btn-ghost btn-block" style="margin-top:8px;font-size:13px" onclick="location.href='home.html'">← Back to Home</button>
+      </div>
+      <div id="auth-step2" style="display:none">
+        <div class="auth-title" id="auth-step2-title">Sign In</div><div class="auth-sub" id="auth-step2-sub"></div>
+        <div class="auth-err" id="auth-err-login"></div>
+        <div class="fgroup"><label class="flabel">Username</label><input type="text" id="auth-username" placeholder="Enter your username" autocomplete="username"></div>
+        <div class="fgroup"><label class="flabel">Password</label><input type="password" id="auth-password" placeholder="Enter your password" autocomplete="current-password" onkeydown="if(event.key==='Enter')doLogin()"></div>
+        <button class="btn btn-primary btn-block" id="login-btn" onclick="doLogin()">Sign In →</button>
+        <div class="auth-divider">or</div>
+        <button class="btn btn-ghost btn-block" onclick="goSignup()">✏️ Create New Account</button>
+        <button class="btn btn-ghost btn-block" style="margin-top:8px;font-size:13px" onclick="backToRoles()">← Change Role</button>
+      </div>
+    </div>
+  </div></div>
+  <div id="notif"><div class="notif-inner" id="notif-inner"></div></div>
+  <script src="../js/config.js"></script><script src="../js/api.js"></script><script src="../js/ui.js"></script><script src="../js/auth.js"></script>
+</body></html>

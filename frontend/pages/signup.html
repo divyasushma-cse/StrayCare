@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>StrayCare — Create Account</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/style.css"><link rel="stylesheet" href="../css/auth.css"><link rel="stylesheet" href="../css/responsive.css">
+</head><body>
+  <div id="auth-overlay"><div class="auth-box" style="max-height:94vh;overflow-y:auto">
+    <div class="auth-header"><div class="brand" onclick="location.href='home.html'" style="cursor:pointer">Stray<em>Care</em></div><p>Rescue. Heal. Protect.</p></div>
+    <div class="auth-body">
+      <div class="auth-title">Create Account</div><div class="auth-sub" id="auth-step3-sub">Choose your role and fill in your details</div>
+      <div class="role-grid">
+        <div class="role-opt" data-role="user" onclick="selectSignupRole(this)"><div class="role-icon">🙋</div><div class="role-name">User</div></div>
+        <div class="role-opt" data-role="responder" onclick="selectSignupRole(this)"><div class="role-icon">🏥</div><div class="role-name">Responder</div></div>
+        <div class="role-opt" data-role="admin" onclick="selectSignupRole(this)"><div class="role-icon">⚙️</div><div class="role-name">Admin</div></div>
+      </div>
+      <div class="signup-role-note" id="signup-admin-note">⚠️ Admin accounts require approval. Your registration will be reviewed before access is granted.</div>
+      <div class="auth-err" id="auth-err-signup"></div>
+      <div class="fgroup"><label class="flabel">Full Name</label><input type="text" id="su-fullname" placeholder="Your full name" autocomplete="name" oninput="clearSignupErr()"></div>
+      <div class="fgroup" id="su-rtype-wrap" style="display:none"><label class="flabel">Responder type</label>
+        <select id="su-rtype"><option value="ngo">NGO</option><option value="vet">Veterinarian</option><option value="volunteer">Volunteer</option></select></div>
+      <div class="fgroup"><label class="flabel">Username <span style="color:var(--text3);font-weight:400">(used to login)</span></label>
+        <div class="input-check"><input type="text" id="su-username" placeholder="Choose a username" autocomplete="off" oninput="checkUsernameAvail()"><span class="ic-icon" id="su-user-icon"></span></div>
+        <div style="font-size:11px;color:var(--text3);margin-top:3px">Letters, numbers, underscores only. 4–20 characters.</div></div>
+      <div class="fgroup"><label class="flabel">Password</label><input type="password" id="su-password" placeholder="Create a password" autocomplete="new-password" oninput="updatePwStrength()">
+        <div class="pw-strength" id="pw-strength-bar"></div><div class="pw-strength-lbl" id="pw-strength-lbl" style="color:var(--text3)"></div></div>
+      <div class="fgroup"><label class="flabel">Confirm Password</label>
+        <div class="input-check"><input type="password" id="su-password2" placeholder="Re-enter password" autocomplete="new-password" oninput="checkPwMatch()" onkeydown="if(event.key==='Enter')doSignup()"><span class="ic-icon" id="su-pw2-icon"></span></div></div>
+      <button class="btn btn-primary btn-block" id="signup-btn" onclick="doSignup()">🐾 Create Account</button>
+      <div class="auth-switch">Already have an account? <a href="login.html">Sign In</a></div>
+    </div>
+  </div></div>
+  <div id="notif"><div class="notif-inner" id="notif-inner"></div></div>
+  <script src="../js/config.js"></script><script src="../js/api.js"></script><script src="../js/ui.js"></script><script src="../js/auth.js"></script>
+</body></html>

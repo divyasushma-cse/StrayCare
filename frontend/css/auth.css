@@ -1,0 +1,230 @@
+/* ============ AUTH OVERLAY ============ */
+    #auth-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 9999;
+      background: rgba(8, 80, 65, 0.92);
+      backdrop-filter: blur(8px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 1.5rem;
+    }
+
+    #auth-overlay.hidden {
+      display: none
+    }
+
+    .auth-box {
+      background: #fff;
+      border-radius: 18px;
+      width: 100%;
+      max-width: 420px;
+      box-shadow: 0 24px 60px rgba(0, 0, 0, 0.3);
+      overflow: hidden;
+      animation: authIn 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    @keyframes authIn {
+      from {
+        transform: scale(0.88);
+        opacity: 0
+      }
+
+      to {
+        transform: scale(1);
+        opacity: 1
+      }
+    }
+
+    .auth-header {
+      background: var(--g2);
+      padding: 2rem 1.75rem 1.5rem;
+      text-align: center
+    }
+
+    .auth-header .brand {
+      font-size: 1.8rem;
+      cursor: default
+    }
+
+    .auth-header p {
+      color: rgba(255, 255, 255, 0.7);
+      font-size: 13px;
+      margin-top: 6px
+    }
+
+    .auth-body {
+      padding: 1.75rem
+    }
+
+    .auth-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.2rem;
+      color: var(--text);
+      margin-bottom: 4px
+    }
+
+    .auth-sub {
+      font-size: 13px;
+      color: var(--text2);
+      margin-bottom: 1.5rem
+    }
+
+    .role-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      margin-bottom: 1.25rem
+    }
+
+    .role-opt {
+      padding: 14px 10px;
+      border-radius: 12px;
+      border: 1.5px solid var(--border2);
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.2s;
+      background: #fff;
+    }
+
+    .role-opt:hover {
+      border-color: var(--g);
+      background: var(--g3)
+    }
+
+    .role-opt.sel {
+      border-color: var(--g);
+      background: var(--g3);
+      box-shadow: 0 0 0 3px rgba(29, 158, 117, 0.12)
+    }
+
+    .role-opt .role-icon {
+      font-size: 1.6rem;
+      margin-bottom: 5px
+    }
+
+    .role-opt .role-name {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text)
+    }
+
+    .role-opt .role-hint {
+      font-size: 11px;
+      color: var(--text2);
+      margin-top: 2px
+    }
+
+    .auth-fields {
+      display: none
+    }
+
+    .auth-fields.show {
+      display: block
+    }
+
+    .auth-err {
+      background: var(--red-l);
+      color: var(--red-d);
+      font-size: 13px;
+      padding: 9px 13px;
+      border-radius: 8px;
+      margin-bottom: 12px;
+      display: none
+    }
+
+    .auth-err.show {
+      display: block
+    }
+
+    .auth-footer {
+      font-size: 12px;
+      color: var(--text3);
+      text-align: center;
+      margin-top: 1rem
+    }
+
+    .auth-switch {
+      font-size: 13px;
+      color: var(--text2);
+      text-align: center;
+      margin-top: 1rem;
+      padding-top: 1rem;
+      border-top: 1px solid var(--border)
+    }
+
+    .auth-switch a {
+      color: var(--g);
+      font-weight: 600;
+      cursor: pointer;
+      text-decoration: none
+    }
+
+    .auth-switch a:hover {
+      color: var(--g2);
+      text-decoration: underline
+    }
+
+    .signup-role-note {
+      font-size: 12px;
+      color: var(--blue);
+      background: var(--blue-l);
+      padding: 9px 12px;
+      border-radius: 8px;
+      margin-bottom: 1rem;
+      display: none
+    }
+
+    .signup-role-note.show {
+      display: block
+    }
+
+    .pw-strength {
+      height: 4px;
+      border-radius: 2px;
+      margin-top: 5px;
+      transition: all 0.3s;
+      background: #ECEAE4
+    }
+
+    .pw-strength-lbl {
+      font-size: 11px;
+      margin-top: 3px
+    }
+
+    .input-check {
+      position: relative
+    }
+
+    .input-check input {
+      padding-right: 34px
+    }
+
+    .input-check .ic-icon {
+      position: absolute;
+      right: 10px;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 14px;
+      pointer-events: none
+    }
+
+    .auth-divider {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin: 1rem 0;
+      color: var(--text3);
+      font-size: 12px
+    }
+
+    .auth-divider::before,
+    .auth-divider::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: var(--border)
+    }
+
+    

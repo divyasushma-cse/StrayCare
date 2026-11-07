@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>StrayCare — My Dashboard</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/style.css">
+  <link rel="stylesheet" href="../css/dashboard.css">
+  <link rel="stylesheet" href="../css/responsive.css">
+</head>
+<body>
+  <div id="topbar"></div>
+  <div id="notif"><div class="notif-inner" id="notif-inner"></div></div>
+  <div class="modal-ov" id="modal-ov" onclick="closeModal(event)"><div class="modal-box" id="modal-box"></div></div>
+  <div class="page active" id="page-user">
+    <div class="container">
+
+      <div class="tab-row" id="user-tabs">
+        <button class="tpill active" onclick="switchSub('user','report',this)">🐾 Report Animal</button>
+        <button class="tpill" onclick="switchSub('user','myreports',this)">📋 My Reports</button>
+        <button class="tpill" onclick="switchSub('user','rewards',this)">⭐ Rewards</button>
+        <button class="tpill" onclick="switchSub('user','donate',this)">❤️ Donate</button>
+      </div>
+
+      <!-- REPORT -->
+      <div class="subtab active" id="user-report">
+        <div class="sh">
+          <h2>Report an Animal in Need</h2>
+          <p>Help us find rescue for injured or stray animals near you</p>
+        </div>
+        <div class="card">
+          <div class="fgroup">
+            <label class="flabel">Photo</label>
+            <div class="photo-ph" id="photo-ph" onclick="document.getElementById('photo-inp').click()">
+              <span style="font-size:2rem">📷</span>
+              <span>Tap to add photo</span>
+              <span style="font-size:11px;color:var(--text3)">Camera or gallery</span>
+            </div>
+            <input type="file" id="photo-inp" accept="image/*" style="display:none" onchange="previewPhoto(this)">
+          </div>
+          <div class="fgroup">
+            <label class="flabel">Animal Type</label>
+            <select id="ani-type">
+              <option value="">Select type...</option>
+              <option>Dog</option>
+              <option>Cat</option>
+              <option>Bird</option>
+              <option>Cow</option>
+              <option>Horse</option>
+              <option>Other</option>
+            </select>
+          </div>
+          <div class="fgroup">
+            <label class="flabel">Severity</label>
+            <div class="sev-grid">
+              <div class="sev-opt" data-sev="critical" onclick="selSev(this)">
+                <div class="sev-icon">🚨</div>
+                <div class="sev-name" style="color:#791F1F">Critical</div>
+                <div class="sev-desc">Life threatening</div>
+              </div>
+              <div class="sev-opt" data-sev="moderate" onclick="selSev(this)">
+                <div class="sev-icon">⚠️</div>
+                <div class="sev-name" style="color:var(--amber-d)">Moderate</div>
+                <div class="sev-desc">Needs care soon</div>
+              </div>
+              <div class="sev-opt" data-sev="mild" onclick="selSev(this)">
+                <div class="sev-icon">🌿</div>
+                <div class="sev-name" style="color:var(--g2)">Not Severe</div>
+                <div class="sev-desc">Lost or stray</div>
+              </div>
+            </div>
+          </div>
+          <div class="fgroup">
+            <label class="flabel">Description</label>
+            <textarea id="ani-desc" placeholder="Describe the animal's condition, injuries, behavior..."></textarea>
+          </div>
+          <div class="fgroup">
+            <label class="flabel">Location</label>
+            <div style="display:flex;gap:8px">
+              <input type="text" id="loc-inp" placeholder="Address or nearby landmark" style="flex:1">
+              <button class="btn btn-ghost btn-sm" onclick="getGPS()" style="white-space:nowrap">📍 GPS</button>
+            </div>
+            <div style="font-size:12px;color:var(--text3);margin-top:4px">A typed address works without GPS. Reports without coordinates are excluded from responders' Nearby-only filter.</div>
+            <div id="gps-msg" style="font-size:12px;color:var(--g);margin-top:4px"></div>
+          </div>
+          <button class="btn btn-primary btn-block" onclick="submitReport()">🐾 Submit Rescue Report</button>
+        </div>
+      </div>
+
+      <!-- MY REPORTS -->
+      <div class="subtab" id="user-myreports">
+        <div class="sh">
+          <h2>My Reports</h2>
+          <p>Real-time status of all your rescue reports</p>
+        </div>
+        <div id="my-reports-list">
+          <p style="color:var(--text2);text-align:center;padding:3rem;font-size:14px">No reports yet — be the first to
+            help an animal in need!</p>
+        </div>
+      </div>
+
+      <!-- REWARDS -->
+      <div class="subtab" id="user-rewards">
+        <div class="sh">
+          <h2>My Rewards</h2>
+        </div>
+        <div class="card" style="text-align:center;padding:2rem 1.5rem">
+          <div style="font-size:3.2rem;font-family:'Playfair Display',serif;font-weight:700;color:var(--g)"
+            id="pts-display">120</div>
+          <div style="color:var(--text2);font-size:14px;margin-top:4px">Total Rescue Points</div>
+          <div style="margin-top:1rem" id="pts-level"></div>
+          <div style="margin-top:1rem;font-size:13px;color:var(--text2)">Earn <strong>30 pts</strong> for critical ·
+            <strong>20 pts</strong> for moderate · <strong>10 pts</strong> for mild reports
+          </div>
+        </div>
+        <div class="card" style="margin-top:1rem">
+          <div class="card-title">Milestones & Certificates</div>
+          <div id="milestones-list"></div>
+        </div>
+      </div>
+
+      <!-- DONATE -->
+      <div class="subtab" id="user-donate">
+        <div class="sh">
+          <h2>Support Rescue Work</h2>
+          <p>Payments are made directly through your UPI app. Claims remain pending until an admin reviews payment evidence; StrayCare does not process or automatically verify transfers.</p>
+        </div>
+        <div class="card">
+          <div class="fgroup">
+            <label class="flabel">Amount (₹)</label>
+            <div class="donate-amts">
+              <button class="btn btn-ghost" onclick="setDonate(100)">₹100</button>
+              <button class="btn btn-ghost" onclick="setDonate(250)">₹250</button>
+              <button class="btn btn-ghost" onclick="setDonate(500)">₹500</button>
+              <button class="btn btn-ghost" onclick="setDonate(1000)">₹1000</button>
+            </div>
+            <input type="number" id="donate-amt" placeholder="Or enter custom amount">
+          </div>
+          <div class="fgroup">
+            <label class="flabel">Donate to</label>
+            <select id="donate-ngo">
+              <option>Chennai Animal Welfare Society</option>
+              <option>Blue Cross of India</option>
+              <option>CARE — Animal Rescue</option>
+              <option>General Rescue Fund</option>
+            </select>
+          </div>
+          <div class="fgroup">
+            <label class="flabel">Name (optional)</label>
+            <input type="text" id="donate-name" placeholder="Your name">
+          </div>
+          <button class="btn btn-primary btn-block" onclick="makeDonation()">❤️ Donate Now</button>
+        </div>
+        <div class="card" style="margin-top:1rem">
+          <div class="card-title">Donation History</div>
+          <div id="donate-hist"></div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+  <script src="../js/config.js"></script>
+  <script src="../js/api.js"></script>
+  <script src="../js/ui.js"></script>
+  <script src="../js/user.js"></script>
+</body>
+</html>

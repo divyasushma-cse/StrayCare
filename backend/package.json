@@ -1,0 +1,35 @@
+{
+  "name": "straycare-backend",
+  "version": "1.0.0",
+  "description": "StrayCare API - Rescue. Heal. Protect.",
+  "main": "src/server.js",
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "node --watch src/server.js",
+    "seed": "node scripts/seed.js",
+    "test:security": "node --test scripts/security.test.js",
+    "test:report-access": "node --test scripts/report-access.test.js",
+    "test:donations": "node --test scripts/donations.test.js",
+    "test:report-coordinates": "node --test scripts/report-coordinates.test.js",
+    "test:responder-lifecycle": "node --test scripts/responder-lifecycle.test.js",
+    "test:unit": "node --test scripts/security.test.js scripts/report-access.test.js scripts/donations.test.js scripts/report-coordinates.test.js scripts/responder-lifecycle.test.js",
+    "test:smoke": "node scripts/test-runner.js",
+    "test": "npm run test:unit && npm run test:smoke"
+  },
+  "license": "MIT",
+  "dependencies": {
+    "bcryptjs": "^3.0.3",
+    "better-sqlite3": "^13.0.3",
+    "cors": "^2.8.6",
+    "dotenv": "^18.0.9",
+    "express": "^5.3.0",
+    "express-rate-limit": "^8.7.3",
+    "helmet": "^8.3.0",
+    "jsonwebtoken": "^9.0.3",
+    "multer": "^2.5.0",
+    "pdfkit": "^0.20.2"
+  },
+  "allowScripts": {
+    "better-sqlite3@13.0.3": true
+  }
+}

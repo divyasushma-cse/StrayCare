@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>StrayCare — Responder Dashboard</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/style.css">
+  <link rel="stylesheet" href="../css/dashboard.css">
+  <link rel="stylesheet" href="../css/responsive.css">
+</head>
+<body>
+  <div id="topbar"></div>
+  <div id="notif"><div class="notif-inner" id="notif-inner"></div></div>
+  <div class="modal-ov" id="modal-ov" onclick="closeModal(event)"><div class="modal-box" id="modal-box"></div></div>
+  <div class="page active" id="page-responder">
+    <div class="container">
+      <div
+        style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1.5rem;flex-wrap:wrap;gap:12px">
+        <div class="sh" style="margin-bottom:0">
+          <h2>Responder Dashboard</h2>
+          <p style="font-size:13px;color:var(--text2)">Incoming rescue requests in your area</p>
+        </div>
+        <div>
+          <label style="font-size:13px;color:var(--text2);display:flex;gap:6px;align-items:center;cursor:pointer"><input type="checkbox" id="nearby-only" style="width:auto" onchange="loadResponder()"> Nearby only (uses GPS)</label>
+          <div style="font-size:11px;color:var(--text3);margin-top:3px">Reports without GPS coordinates are hidden in this filter.</div>
+        </div>
+        <select id="resp-type" style="width:auto;padding:7px 14px;border-radius:20px;font-size:13px"
+          onchange="setRespType(this.value)">
+          <option value="ngo">NGO</option>
+          <option value="vet">Veterinarian</option>
+          <option value="volunteer">Volunteer</option>
+        </select>
+      </div>
+
+      <div class="grid4" style="margin-bottom:1.5rem">
+        <div class="stat">
+          <div class="stat-n" id="rs-open">0</div>
+          <div class="stat-l">Open</div>
+        </div>
+        <div class="stat">
+          <div class="stat-n" id="rs-accepted">0</div>
+          <div class="stat-l">My Accepted</div>
+        </div>
+        <div class="stat">
+          <div class="stat-n" id="rs-completed">0</div>
+          <div class="stat-l">Completed</div>
+        </div>
+        <div class="stat">
+          <div class="stat-n" id="rs-critical">0</div>
+          <div class="stat-l">Critical</div>
+        </div>
+      </div>
+
+      <div class="card" style="margin-bottom:1rem">
+        <div class="card-title">Incoming Requests <span class="pulse"
+            style="color:var(--red);font-size:12px;font-weight:400">● LIVE</span></div>
+        <div id="resp-requests"></div>
+      </div>
+      <div class="card">
+        <div class="card-title">My Active Cases</div>
+        <div id="resp-active"></div>
+      </div>
+    </div>
+  </div>
+  <script src="../js/config.js"></script>
+  <script src="../js/api.js"></script>
+  <script src="../js/ui.js"></script>
+  <script src="../js/responder.js"></script>
+</body>
+</html>

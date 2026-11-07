@@ -1,0 +1,45 @@
+@media(max-width:640px) {
+      .adm-kpi-grid { grid-template-columns: 1fr 1fr; }
+      .adm-hero { flex-direction: column; align-items: flex-start; }
+    }
+
+    @media(max-width:640px) {
+
+      .grid2,
+      .grid3,
+      .grid4 {
+        grid-template-columns: 1fr
+      }
+
+      .grid3 {
+        grid-template-columns: 1fr 1fr
+      }
+
+      #topbar {
+        padding: 0 1rem
+      }
+
+      .container {
+        padding: 1rem
+      }
+
+      .tab-row {
+        overflow-x: auto;
+        width: 100%;
+        border-radius: 10px
+      }
+
+      .stats-row {
+        grid-template-columns: 1fr 1fr 1fr
+      }
+    }
+
+    @media(max-width:400px) {
+      .stats-row {
+        grid-template-columns: 1fr
+      }
+
+      .donate-amts {
+        grid-template-columns: 1fr 1fr
+      }
+    }
