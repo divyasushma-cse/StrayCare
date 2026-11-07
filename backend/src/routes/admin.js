@@ -14,17 +14,58 @@ router.use(requireAuth, requireRole('admin'));
 // ---- Live feed ----
 router.get('/summary', (req, res) => {
   const n = sql => db.prepare(sql).get().n;
+  const activeStatuses = "'reported','accepted','onway'";
   res.json({
-    total: n('SELECT COUNT(*) n FROM reports'),
-    active: n("SELECT COUNT(*) n FROM reports WHERE status != 'completed'"),
-    rescued: n("SELECT COUNT(*) n FROM reports WHERE status IN ('rescued','completed')"),
-    critical: n("SELECT COUNT(*) n FROM reports WHERE severity = 'critical'"),
-    open: n("SELECT COUNT(*) n FROM reports WHERE status = 'reported'")
+    total: n('SELECT COUNT(*) n FROM reports WHERE is_demo = 0'),
+    active: n(`SELECT COUNT(*) n FROM reports WHERE is_demo = 0 AND status IN (${activeStatuses})`),
+    rescued: n("SELECT COUNT(*) n FROM reports WHERE is_demo = 0 AND status IN ('rescued','completed')"),
+    critical: n(`SELECT COUNT(*) n FROM reports WHERE is_demo = 0 AND severity = 'critical' AND status IN (${activeStatuses})`),
+    open: n("SELECT COUNT(*) n FROM reports WHERE is_demo = 0 AND status = 'reported'"),
+    demoReports: n('SELECT COUNT(*) n FROM reports WHERE is_demo = 1')
   });
 });
 
 router.get('/reports', (req, res) => {
+  if (req.query.page !== undefined || req.query.status || req.query.severity || req.query.q || req.query.realOnly) {
+    const page = Number(req.query.page || 1), limit = Number(req.query.limit || 20);
+    if (!Number.isSafeInteger(page) || page < 1 || !Number.isInteger(limit) || limit < 1 || limit > 100
+      || !Number.isSafeInteger((page - 1) * limit)) {
+      throw new HttpError(400, 'Page must be positive and limit must be between 1 and 100');
+    }
+    const where = [];
+    const params = [];
+    const statuses = {
+      active: ["'reported'", "'accepted'", "'onway'"],
+      reported: ["'reported'"],
+      accepted: ["'accepted'"],
+      onway: ["'onway'"],
+      rescued: ["'rescued'"],
+      completed: ["'completed'"]
+    };
+    if (req.query.status && !statuses[req.query.status]) throw new HttpError(400, 'Unknown report status filter');
+    if (req.query.status) where.push(`r.status IN (${statuses[req.query.status].join(',')})`);
+    if (req.query.severity) {
+      if (!['critical', 'moderate', 'mild'].includes(req.query.severity)) throw new HttpError(400, 'Unknown severity filter');
+      where.push('r.severity = ?'); params.push(req.query.severity);
+    }
+    if (req.query.realOnly === '1') where.push('r.is_demo = 0');
+    if (req.query.q) {
+      const query = String(req.query.q).trim().slice(0, 100);
+      where.push("(CAST(r.id AS TEXT) LIKE ? OR ('SC-' || r.id) LIKE ? OR r.description LIKE ? OR r.location LIKE ? OR r.animal_type LIKE ?)");
+      params.push(...Array(5).fill(`%${query}%`));
+    }
+    const clause = where.length ? `WHERE ${where.join(' AND ')}` : '';
+    const total = db.prepare(`SELECT COUNT(*) n FROM reports r ${clause}`).get(...params).n;
+    const rows = db.prepare(`${BASE} ${clause} ORDER BY r.id DESC LIMIT ? OFFSET ?`)
+      .all(...params, limit, (page - 1) * limit);
+    return res.json({ reports: rows.map(r => present(r)), page, limit, total, hasMore: page * limit < total });
+  }
   const rows = db.prepare(`${BASE} ORDER BY r.id DESC LIMIT 500`).all();
+  res.json({ reports: rows.map(r => present(r)) });
+});
+
+router.get('/reports/oldest-open', (req, res) => {
+  const rows = db.prepare(`${BASE} WHERE r.status = 'reported' AND r.is_demo = 0 ORDER BY r.created_at ASC, r.id ASC LIMIT 8`).all();
   res.json({ reports: rows.map(r => present(r)) });
 });
 
@@ -67,7 +108,7 @@ router.patch('/donations/:id/verify', (req, res) => {
 });
 
 // ---- Access control ----
-const userOut = u => ({ id: u.id, username: u.username, name: u.name, role: u.role, status: u.status, responderType: u.responder_type });
+const userOut = u => ({ id: u.id, username: u.username, name: u.name, role: u.role, status: u.status, responderType: u.responder_type, isDemo: Boolean(u.is_demo) });
 
 router.get('/users', (req, res) => {
   const rows = db.prepare("SELECT * FROM users WHERE role IN ('responder','admin') ORDER BY id DESC").all();

@@ -6,32 +6,32 @@
     }
 
     :root {
-      --g: #1D9E75;
-      --g2: #085041;
-      --g3: #E1F5EE;
-      --g4: #9FE1CB;
-      --coral: #D85A30;
-      --coral-l: #FAECE7;
-      --coral-d: #4A1B0C;
-      --amber: #BA7517;
-      --amber-l: #FAEEDA;
-      --amber-d: #633806;
-      --red: #E24B4A;
-      --red-l: #FCEBEB;
-      --red-d: #791F1F;
-      --blue: #185FA5;
-      --blue-l: #E6F1FB;
-      --bg: #F5F3EE;
+      --g: #167D68;
+      --g2: #123F35;
+      --g3: #DDF3E9;
+      --g4: #A7E4CF;
+      --coral: #B95036;
+      --coral-l: #FCE8E4;
+      --coral-d: #8A3028;
+      --amber: #94620F;
+      --amber-l: #F8EFD9;
+      --amber-d: #68460D;
+      --red: #B9413C;
+      --red-l: #FCE8E4;
+      --red-d: #8A3028;
+      --blue: #3E7090;
+      --blue-l: #E5EFF5;
+      --bg: #FAF8F2;
       --card: #FFFFFF;
-      --text: #1C1B18;
-      --text2: #6B6A65;
-      --text3: #9E9D98;
-      --border: rgba(0, 0, 0, 0.09);
-      --border2: rgba(0, 0, 0, 0.15);
-      --r: 14px;
-      --r-sm: 8px;
+      --text: #1C2925;
+      --text2: #596B63;
+      --text3: #68786F;
+      --border: rgba(18, 63, 53, 0.10);
+      --border2: rgba(18, 63, 53, 0.20);
+      --r: 16px;
+      --r-sm: 10px;
       --r-xs: 6px;
-      --shadow: 0 1px 3px rgba(0, 0, 0, 0.07), 0 4px 12px rgba(0, 0, 0, 0.04);
+      --shadow: 0 2px 6px rgba(18, 63, 53, 0.045), 0 10px 26px rgba(18, 63, 53, 0.055);
     }
 
     html {
@@ -188,7 +188,13 @@
       border-radius: var(--r);
       border: 0.5px solid var(--border);
       padding: 1.25rem;
-      box-shadow: var(--shadow)
+      box-shadow: var(--shadow);
+      transition: border-color 0.2s, box-shadow 0.2s, transform 0.2s
+    }
+
+    .card:hover {
+      border-color: rgba(22, 125, 104, 0.18);
+      box-shadow: 0 5px 12px rgba(18, 63, 53, 0.05), 0 16px 34px rgba(18, 63, 53, 0.07)
     }
 
     .card+.card {
@@ -302,6 +308,11 @@
       color: #444441
     }
 
+    .demo-tag {
+      letter-spacing: .45px;
+      font-size: 9px !important
+    }
+
     
 /* ============ BUTTONS ============ */
     .btn {
@@ -311,7 +322,7 @@
       font-weight: 500;
       cursor: pointer;
       border: none;
-      transition: all 0.18s;
+      transition: background-color 0.18s, box-shadow 0.18s, transform 0.18s;
       display: inline-flex;
       align-items: center;
       gap: 6px
@@ -323,7 +334,9 @@
     }
 
     .btn-primary:hover {
-      background: var(--g2)
+      background: var(--g2);
+      box-shadow: 0 5px 14px rgba(18, 63, 53, 0.18);
+      transform: translateY(-1px)
     }
 
     .btn-danger {
@@ -378,6 +391,7 @@
     input[type=text],
     input[type=number],
     input[type=email],
+    input[type=password],
     select,
     textarea {
       width: 100%;
@@ -395,7 +409,23 @@
     select:focus,
     textarea:focus {
       border-color: var(--g);
-      box-shadow: 0 0 0 3px rgba(29, 158, 117, 0.1)
+      box-shadow: 0 0 0 3px rgba(22, 125, 104, 0.14)
+    }
+
+    :focus-visible {
+      outline: 3px solid rgba(22, 125, 104, 0.55);
+      outline-offset: 2px
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *,
+      *::before,
+      *::after {
+        scroll-behavior: auto !important;
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+      }
     }
 
     textarea {
@@ -608,8 +638,10 @@
     
 /* ============ HERO (LANDING) ============ */
     #page-home .hero {
-      background: var(--g2);
-      padding: 3.5rem 1.5rem 4rem;
+      background:
+        radial-gradient(ellipse at 50% 0%, rgba(42, 119, 96, 0.42), transparent 58%),
+        linear-gradient(145deg, #123F35 0%, #10392F 58%, #0D332B 100%);
+      padding: 5rem 1.5rem 4.25rem;
       text-align: center;
       position: relative;
       overflow: hidden;
@@ -618,14 +650,17 @@
     .hero-bg-dots {
       position: absolute;
       inset: 0;
-      background-image: radial-gradient(rgba(255, 255, 255, 0.06) 1px, transparent 1px);
-      background-size: 28px 28px
+      background-image: radial-gradient(rgba(221, 243, 233, 0.10) 1px, transparent 1px);
+      background-size: 30px 30px;
+      mask-image: linear-gradient(to bottom, black, transparent 90%);
+      pointer-events: none
     }
 
     .hero h1 {
-      font-size: clamp(2rem, 5vw, 3rem);
+      font-size: clamp(2.4rem, 5.5vw, 3.6rem);
       color: #fff;
-      position: relative
+      position: relative;
+      letter-spacing: -1.2px
     }
 
     .hero h1 em {
@@ -634,10 +669,11 @@
     }
 
     .hero p {
-      color: rgba(255, 255, 255, 0.75);
-      font-size: 1rem;
+      color: rgba(255, 255, 255, 0.82);
+      font-size: 1.05rem;
       margin: 1rem auto 2rem;
-      max-width: 520px;
+      max-width: 600px;
+      line-height: 1.75;
       position: relative
     }
 
@@ -650,25 +686,28 @@
     }
 
     .hero-btn-p {
-      background: var(--g4);
-      color: var(--g2);
-      font-weight: 600;
+      background: var(--g);
+      color: #fff;
+      font-weight: 700;
       padding: 13px 28px;
       border-radius: var(--r-sm);
       border: none;
       cursor: pointer;
       font-size: 15px;
       font-family: 'Outfit', sans-serif;
-      transition: all 0.2s
+      transition: all 0.2s;
+      box-shadow: 0 6px 18px rgba(0, 0, 0, 0.18)
     }
 
     .hero-btn-p:hover {
-      background: #fff
+      background: #1B9279;
+      transform: translateY(-2px);
+      box-shadow: 0 9px 22px rgba(0, 0, 0, 0.22)
     }
 
     .hero-btn-s {
       background: transparent;
-      border: 1.5px solid rgba(255, 255, 255, 0.4);
+      border: 1.5px solid rgba(221, 243, 233, 0.52);
       color: #fff;
       padding: 13px 28px;
       border-radius: var(--r-sm);
@@ -679,7 +718,8 @@
     }
 
     .hero-btn-s:hover {
-      background: rgba(255, 255, 255, 0.1)
+      background: rgba(221, 243, 233, 0.12);
+      border-color: rgba(221, 243, 233, 0.78)
     }
 
     .stats-row {
@@ -704,7 +744,7 @@
 
     .stat-hero-l {
       font-size: 12px;
-      color: rgba(255, 255, 255, 0.6);
+      color: rgba(255, 255, 255, 0.76);
       text-transform: uppercase;
       letter-spacing: 0.5px
     }
@@ -724,11 +764,13 @@
       padding: 1.5rem;
       border: 0.5px solid var(--border);
       box-shadow: var(--shadow);
-      transition: transform 0.2s
+      transition: transform 0.2s, box-shadow 0.2s, border-color 0.2s
     }
 
     .feat-card:hover {
-      transform: translateY(-2px)
+      transform: translateY(-4px);
+      border-color: rgba(22, 125, 104, 0.22);
+      box-shadow: 0 10px 26px rgba(18, 63, 53, 0.10)
     }
 
     .feat-icon {

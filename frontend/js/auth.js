@@ -2,11 +2,6 @@ let selectedRole = null;
 const qRole = new URLSearchParams(location.search).get('role');
 if (Session.token && Session.user) location.replace(ROLE_PAGE[Session.user.role]);
 
-const ROLE_INFO = {
-  user: ['👤 User Login', 'Sign in to report and track animals'],
-  responder: ['🏥 Responder Login', 'Access rescue requests in your area'],
-  admin: ['⚙️ Admin Login', 'Authorised personnel only']
-};
 const show = (id, on) => { const e = document.getElementById(id); if (e) e.style.display = on ? 'block' : 'none'; };
 const flash = (id, msg) => { const e = document.getElementById(id); if (!e) return; e.textContent = msg; e.classList.add('show'); };
 
@@ -15,22 +10,28 @@ function selectRole(el) {
   el.classList.add('sel'); selectedRole = el.dataset.role;
   document.getElementById('auth-err-role')?.classList.remove('show');
 }
-function proceedToLogin() {
-  if (!selectedRole) return document.getElementById('auth-err-role').classList.add('show');
-  show('auth-step1', false); show('auth-step2', true);
-  document.getElementById('auth-step2-title').textContent = ROLE_INFO[selectedRole][0];
-  document.getElementById('auth-step2-sub').textContent = ROLE_INFO[selectedRole][1];
-  document.getElementById('auth-username').focus();
+function goSignup() {
+  const role = document.getElementById('auth-role')?.value || selectedRole || 'user';
+  location.href = 'signup.html?role=' + role;
 }
-function backToRoles() { show('auth-step2', false); show('auth-step1', true); }
-function goSignup() { location.href = 'signup.html?role=' + selectedRole; }
+
+function toggleLoginPassword() {
+  const input = document.getElementById('auth-password');
+  const button = document.getElementById('auth-password-toggle');
+  const visible = input.type === 'password';
+  input.type = visible ? 'text' : 'password';
+  button.textContent = visible ? 'Hide' : 'Show';
+  button.setAttribute('aria-pressed', String(visible));
+  button.setAttribute('aria-label', `${visible ? 'Hide' : 'Show'} password`);
+}
 
 async function doLogin() {
+  selectedRole = document.getElementById('auth-role').value;
   const username = document.getElementById('auth-username').value.trim();
   const password = document.getElementById('auth-password').value;
   const err = document.getElementById('auth-err-login'); err.classList.remove('show');
-  if (!username || !password) return flash('auth-err-login', 'Please enter username and password.');
-  const btn = document.getElementById('login-btn'); btn.disabled = true;
+  if (!selectedRole || !username || !password) return flash('auth-err-login', 'Choose your role and enter your username and password.');
+  const btn = document.getElementById('login-btn'); if (btn.disabled) return; btn.disabled = true;
   try {
     const d = await api('/auth/login', { method: 'POST', body: { username, password, role: selectedRole } });
     Session.set(d.token, d.user);
@@ -59,8 +60,8 @@ function checkUsernameAvail() {
 function updatePwStrength() {
   const pw = document.getElementById('su-password').value, bar = document.getElementById('pw-strength-bar'), lbl = document.getElementById('pw-strength-lbl');
   let s = 0; if (pw.length >= 6) s++; if (pw.length >= 10) s++; if (/[A-Z]/.test(pw) && /[a-z]/.test(pw)) s++; if (/\d/.test(pw)) s++; if (/[^A-Za-z0-9]/.test(pw)) s++;
-  const lv = [['', '#ECEAE4', 0], ['Weak', '#E24B4A', 25], ['Fair', '#BA7517', 50], ['Good', '#1D9E75', 75], ['Strong', '#085041', 100]][pw ? Math.min(Math.ceil(s * 4 / 5), 4) || 1 : 0];
-  bar.style.background = `linear-gradient(to right, ${lv[1]} ${lv[2]}%, #ECEAE4 ${lv[2]}%)`; lbl.textContent = lv[0]; lbl.style.color = lv[1];
+  const lv = [['', '#E7ECE7', 0], ['Weak', '#B9413C', 25], ['Fair', '#94620F', 50], ['Good', '#167D68', 75], ['Strong', '#123F35', 100]][pw ? Math.min(Math.ceil(s * 4 / 5), 4) || 1 : 0];
+  bar.style.background = `linear-gradient(to right, ${lv[1]} ${lv[2]}%, #E7ECE7 ${lv[2]}%)`; lbl.textContent = lv[0]; lbl.style.color = lv[1];
   checkPwMatch();
 }
 function checkPwMatch() {
@@ -83,7 +84,13 @@ async function doSignup() {
 // Preselect role from ?role=
 window.addEventListener('DOMContentLoaded', () => {
   if (!['user', 'responder', 'admin'].includes(qRole)) return;
+  const roleSelect = document.getElementById('auth-role');
+  if (roleSelect) {
+    roleSelect.value = qRole;
+    selectedRole = qRole;
+    return;
+  }
   const el = document.querySelector(`.role-opt[data-role="${qRole}"]`);
   if (!el) return;
-  if (document.getElementById('auth-step1')) { selectRole(el); proceedToLogin(); } else selectSignupRole(el);
+  if (document.getElementById('auth-step1')) selectRole(el); else selectSignupRole(el);
 });

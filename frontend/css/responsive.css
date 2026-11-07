@@ -29,6 +29,12 @@
         border-radius: 10px
       }
 
+      .admin-tabs {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        overflow: visible;
+      }
+
       .stats-row {
         grid-template-columns: 1fr 1fr 1fr
       }
@@ -41,5 +47,78 @@
 
       .donate-amts {
         grid-template-columns: 1fr 1fr
+      }
+    }
+
+    @media(max-width:680px) {
+      .responder-header {
+        align-items: flex-start;
+        padding: 1.15rem
+      }
+
+      .responder-controls {
+        width: 100%;
+        justify-content: space-between
+      }
+
+      .responder-kpis {
+        grid-template-columns: repeat(2, minmax(0, 1fr))
+      }
+
+      #resp-requests {
+        grid-template-columns: 1fr
+      }
+    }
+
+    @media(max-width:420px) {
+      .responder-header {
+        padding: 1rem
+      }
+
+      .responder-controls {
+        align-items: flex-start;
+        flex-direction: column;
+        gap: 10px
+      }
+
+      .responder-controls select {
+        width: 100%
+      }
+
+      .responder-kpi {
+        min-height: 92px;
+        padding-left: 52px
+      }
+
+      .responder-kpi-icon {
+        left: 11px
+      }
+
+      .responder-section {
+        padding: 1rem
+      }
+
+      .req-card {
+        padding: 12px
+      }
+
+      .req-card-footer .btn {
+        padding: 7px 10px
+      }
+    }
+
+    @media(max-width:520px) {
+      .adm-review-row {
+        align-items: flex-start;
+        flex-wrap: wrap;
+        gap: 7px
+      }
+
+      .adm-review-info {
+        flex-basis: calc(100% - 8px)
+      }
+
+      .adm-review-row .btn {
+        margin-left: auto
       }
     }

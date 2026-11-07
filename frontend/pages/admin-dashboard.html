@@ -14,7 +14,7 @@
 <body>
   <div id="topbar"></div>
   <div id="notif"><div class="notif-inner" id="notif-inner"></div></div>
-  <div class="modal-ov" id="modal-ov" onclick="closeModal(event)"><div class="modal-box" id="modal-box"></div></div>
+  <div class="modal-ov" id="modal-ov" role="dialog" aria-modal="true" aria-labelledby="modal-title" aria-hidden="true" onclick="closeModal(event)"><div class="modal-box" id="modal-box" tabindex="-1"></div></div>
   <div class="page active" id="page-admin">
     <div class="container">
 
@@ -25,24 +25,25 @@
           <p id="adm-hero-sub">Welcome back — full system access granted</p>
         </div>
         <div class="adm-hero-right">
+          <span class="adm-demo-badge" id="adm-demo-badge" hidden></span>
           <span class="adm-role-badge" id="adm-badge">⚡ Admin</span>
           <span class="adm-clock" id="adm-clock">--:--:--</span>
         </div>
       </div>
 
       <!-- TAB ROW -->
-      <div class="tab-row" style="overflow-x:auto;white-space:nowrap;padding-bottom:4px;width:100%;border-radius:10px">
-        <button class="tpill active" onclick="switchSub('admin','live',this)">🔴 Live Feed</button>
-        <button class="tpill" onclick="switchSub('admin','dispatch',this)" style="color:var(--red);font-weight:600">⚡ Dispatch Center</button>
-        <button class="tpill" onclick="switchSub('admin','users',this)" style="color:var(--amber-d);font-weight:600">🛡️ Access Control</button>
-        <button class="tpill" onclick="switchSub('admin','weekly',this)">📅 Weekly</button>
-        <button class="tpill" onclick="switchSub('admin','monthly',this)">📆 Monthly</button>
-        <button class="tpill" onclick="switchSub('admin','breakdown',this)">📊 Data</button>
-        <button class="tpill" onclick="switchSub('admin','export',this)" style="color:var(--blue);font-weight:600">📤 Export</button>
+      <div class="tab-row admin-tabs" role="tablist" aria-label="Admin dashboard sections">
+        <button id="admin-tab-live" class="tpill active" role="tab" aria-selected="true" aria-controls="admin-live" tabindex="0" onclick="switchSub('admin','live',this)">🔴 Live Feed</button>
+        <button id="admin-tab-dispatch" class="tpill" role="tab" aria-selected="false" aria-controls="admin-dispatch" tabindex="-1" onclick="switchSub('admin','dispatch',this)">⚡ Dispatch Center</button>
+        <button id="admin-tab-users" class="tpill" role="tab" aria-selected="false" aria-controls="admin-users" tabindex="-1" onclick="switchSub('admin','users',this)">🛡️ Access Control</button>
+        <button id="admin-tab-weekly" class="tpill" role="tab" aria-selected="false" aria-controls="admin-weekly" tabindex="-1" onclick="switchSub('admin','weekly',this)">📅 Weekly</button>
+        <button id="admin-tab-monthly" class="tpill" role="tab" aria-selected="false" aria-controls="admin-monthly" tabindex="-1" onclick="switchSub('admin','monthly',this)">📆 Monthly</button>
+        <button id="admin-tab-breakdown" class="tpill" role="tab" aria-selected="false" aria-controls="admin-breakdown" tabindex="-1" onclick="switchSub('admin','breakdown',this)">📊 Data</button>
+        <button id="admin-tab-export" class="tpill" role="tab" aria-selected="false" aria-controls="admin-export" tabindex="-1" onclick="switchSub('admin','export',this)">📤 Export</button>
       </div>
 
       <!-- LIVE -->
-      <div class="subtab active" id="admin-live">
+      <div class="subtab active" id="admin-live" role="tabpanel" aria-labelledby="admin-tab-live" tabindex="0">
 
         <!-- KPI Cards -->
         <div class="adm-kpi-grid">
@@ -50,8 +51,8 @@
             <div class="adm-kpi-icon">📋</div>
             <div class="adm-kpi-body">
               <div class="adm-kpi-num" id="adm-total">0</div>
-              <div class="adm-kpi-lbl">Total Reports</div>
-              <div class="adm-kpi-sub" style="color:var(--blue)" id="adm-total-d"></div>
+              <div class="adm-kpi-lbl">Real Reports</div>
+              <div class="adm-kpi-sub" style="color:var(--blue)">Demo records excluded</div>
             </div>
           </div>
           <div class="adm-kpi kpi-active">
@@ -59,23 +60,23 @@
             <div class="adm-kpi-body">
               <div class="adm-kpi-num" id="adm-active">0</div>
               <div class="adm-kpi-lbl">Active Cases</div>
-              <div class="adm-kpi-sub" style="color:var(--amber)">In progress</div>
+              <div class="adm-kpi-sub" style="color:var(--amber)">Reported or assigned</div>
             </div>
           </div>
           <div class="adm-kpi kpi-rescued">
             <div class="adm-kpi-icon">🐾</div>
             <div class="adm-kpi-body">
               <div class="adm-kpi-num" id="adm-rescued">0</div>
-              <div class="adm-kpi-lbl">Rescued</div>
-              <div class="adm-kpi-sub" style="color:var(--g)">Successfully rescued</div>
+              <div class="adm-kpi-lbl">Rescued / Completed</div>
+              <div class="adm-kpi-sub" style="color:var(--g)">Resolved cases</div>
             </div>
           </div>
           <div class="adm-kpi kpi-critical">
             <div class="adm-kpi-icon">🚨</div>
             <div class="adm-kpi-body">
               <div class="adm-kpi-num" id="adm-critical">0</div>
-              <div class="adm-kpi-lbl">Critical</div>
-              <div class="adm-kpi-sub" style="color:var(--red)">Needs priority</div>
+              <div class="adm-kpi-lbl">Active Critical</div>
+              <div class="adm-kpi-sub" style="color:var(--red)">Real cases needing priority</div>
             </div>
           </div>
         </div>
@@ -83,15 +84,15 @@
         <!-- System Status Bar -->
         <div class="adm-status-bar">
           <div class="adm-status-item">
-            <div class="adm-status-dot green pulse"></div>
+            <div class="adm-status-dot green pulse" aria-hidden="true"></div>
             <span><strong style="color:var(--text)">System Operational</strong></span>
           </div>
           <div class="adm-status-item">
-            <div class="adm-status-dot green"></div>
+            <div class="adm-status-dot green" aria-hidden="true"></div>
             <span>Open cases: <strong id="adm-status-open-n" style="color:var(--text)">0</strong></span>
           </div>
           <div class="adm-status-item">
-            <div class="adm-status-dot green"></div>
+            <div class="adm-status-dot green" aria-hidden="true"></div>
             <span>Dispatch: <strong style="color:var(--text)">Auto</strong></span>
           </div>
           <div class="adm-status-item" style="margin-left:auto;font-size:11.5px;color:var(--text3)">
@@ -102,27 +103,64 @@
         <!-- Critical Cases -->
         <div class="card" style="margin-bottom:1rem">
           <div class="card-title" style="color:var(--red);display:flex;align-items:center;gap:8px;flex-wrap:wrap">
-            <span class="pulse">🔴</span> Critical Cases
+            <span class="pulse" aria-hidden="true">🔴</span> Urgent Active Critical Cases
             <span class="badge b-critical" id="adm-crit-count" style="font-size:11px;padding:2px 8px">0</span>
-            <span style="margin-left:auto;font-size:12px;font-weight:400;color:var(--text2)">Priority — immediate action required</span>
+            <span style="margin-left:auto;font-size:12px;font-weight:400;color:var(--text2)">Reported, accepted, or on the way · demo cases excluded</span>
           </div>
-          <div id="adm-crits"></div>
+          <div id="adm-crits" aria-live="polite"></div>
+          <button type="button" class="btn btn-ghost btn-sm" onclick="viewCriticalCases()">View all active critical cases</button>
         </div>
 
         <!-- All Cases -->
-        <div class="card">
-          <div class="card-title" style="display:flex;align-items:center;gap:8px">
-            📑 All Active Cases
-            <span style="margin-left:auto">
-              <span class="badge b-reported" id="adm-all-count" style="font-size:11px;padding:2px 8px">0 total</span>
-            </span>
+        <div class="card" id="admin-all-reports">
+          <div class="card-title" style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+            📑 Reports
+            <span class="badge b-reported" id="adm-all-count" style="font-size:11px;padding:2px 8px">0 total</span>
+            <span style="font-size:12px;font-weight:400;color:var(--text2)">Includes demo history; operational KPIs exclude it.</span>
           </div>
-          <div id="adm-all"></div>
+          <form id="admin-case-filters" class="admin-case-filters" role="search" aria-label="Filter reports">
+            <label for="admin-case-search">Search reports</label>
+            <input id="admin-case-search" type="search" maxlength="100" placeholder="Case ID, animal, description, or location">
+            <label for="admin-case-status">Status</label>
+            <select id="admin-case-status">
+              <option value="">All statuses</option>
+              <option value="active">Active</option>
+              <option value="reported">Reported</option>
+              <option value="accepted">Accepted</option>
+              <option value="onway">On the way</option>
+              <option value="rescued">Rescued</option>
+              <option value="completed">Completed</option>
+            </select>
+            <label for="admin-case-severity">Severity</label>
+            <select id="admin-case-severity">
+              <option value="">All severities</option>
+              <option value="critical">Critical</option>
+              <option value="moderate">Moderate</option>
+              <option value="mild">Mild</option>
+            </select>
+            <label class="admin-demo-filter" for="admin-case-real-only">
+              <input id="admin-case-real-only" type="checkbox">
+              Real reports only
+            </label>
+            <button type="submit" class="btn btn-primary btn-sm">Apply filters</button>
+            <button type="button" class="btn btn-ghost btn-sm" onclick="resetAdminCaseFilters()">Clear</button>
+          </form>
+          <div id="adm-all" aria-live="polite"></div>
+          <div id="adm-case-pagination" class="admin-case-pagination"></div>
         </div>
       </div>
 
       <!-- DISPATCH CENTER -->
-      <div class="subtab" id="admin-dispatch">
+      <div class="subtab" id="admin-dispatch" role="tabpanel" aria-labelledby="admin-tab-dispatch" tabindex="0">
+        <div class="card" style="margin-bottom:1rem">
+          <div class="adm-section-chip chip-amber">
+            <span class="chip-icon">🕰️</span>
+            Oldest Open Reports
+            <span class="chip-badge" style="background:var(--amber-l);color:var(--amber-d)">REVIEW</span>
+          </div>
+          <p style="font-size:13px;color:var(--text2);margin:-0.25rem 0 1rem">Review the oldest cases and confirm they still need help. Viewing a case does not change or close it.</p>
+          <div id="adm-stale-review"><p style="font-size:13px;color:var(--text2)">Loading oldest open reports…</p></div>
+        </div>
         <div class="card" style="margin-bottom:1rem">
           <div class="adm-section-chip chip-red">
             <span class="chip-icon">⚡</span>
@@ -153,7 +191,7 @@
       </div>
 
       <!-- ACCESS MANAGEMENT -->
-      <div class="subtab" id="admin-users">
+      <div class="subtab" id="admin-users" role="tabpanel" aria-labelledby="admin-tab-users" tabindex="0">
         <div class="card" style="margin-bottom:1rem">
           <div class="adm-section-chip chip-amber">
             <span class="chip-icon">⏳</span>
@@ -175,7 +213,7 @@
       </div>
 
       <!-- WEEKLY -->
-      <div class="subtab" id="admin-weekly">
+      <div class="subtab" id="admin-weekly" role="tabpanel" aria-labelledby="admin-tab-weekly" tabindex="0">
 
         <!-- Section header -->
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1.1rem;flex-wrap:wrap;gap:8px">
@@ -253,7 +291,7 @@
 
 
       <!-- MONTHLY -->
-      <div class="subtab" id="admin-monthly">
+      <div class="subtab" id="admin-monthly" role="tabpanel" aria-labelledby="admin-tab-monthly" tabindex="0">
 
         <!-- Section header -->
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1.1rem;flex-wrap:wrap;gap:8px">
@@ -297,7 +335,7 @@
 
 
       <!-- BREAKDOWN -->
-      <div class="subtab" id="admin-breakdown">
+      <div class="subtab" id="admin-breakdown" role="tabpanel" aria-labelledby="admin-tab-breakdown" tabindex="0">
 
         <!-- Section header -->
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1.1rem;flex-wrap:wrap;gap:8px">
@@ -354,7 +392,7 @@
       </div>
 
       <!-- EXPORT CENTER -->
-      <div class="subtab" id="admin-export">
+      <div class="subtab" id="admin-export" role="tabpanel" aria-labelledby="admin-tab-export" tabindex="0">
 
         <!-- Header -->
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1.25rem;flex-wrap:wrap;gap:8px">

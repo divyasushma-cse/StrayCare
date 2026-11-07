@@ -20,6 +20,7 @@ function present(row, { events = false } = {}) {
     hasCoordinates: hasCoordinates(row),
     photo: row.photo_path ? `/api/reports/${row.id}/photo` : null,
     status: row.status,
+    isDemo: Boolean(row.is_demo),
     radiusLevel: row.radius_level,
     radiusKm: row.radius_km,
     assignedTo: row.assigned_to,

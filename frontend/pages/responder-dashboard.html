@@ -12,55 +12,74 @@
 <body>
   <div id="topbar"></div>
   <div id="notif"><div class="notif-inner" id="notif-inner"></div></div>
-  <div class="modal-ov" id="modal-ov" onclick="closeModal(event)"><div class="modal-box" id="modal-box"></div></div>
+  <div class="modal-ov" id="modal-ov" role="dialog" aria-modal="true" aria-labelledby="modal-title" aria-hidden="true" onclick="closeModal(event)"><div class="modal-box" id="modal-box" tabindex="-1"></div></div>
   <div class="page active" id="page-responder">
-    <div class="container">
-      <div
-        style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1.5rem;flex-wrap:wrap;gap:12px">
-        <div class="sh" style="margin-bottom:0">
+    <div class="container responder-container">
+      <header class="responder-header">
+        <div class="sh responder-heading">
+          <span class="responder-eyebrow">Dispatch center</span>
           <h2>Responder Dashboard</h2>
-          <p style="font-size:13px;color:var(--text2)">Incoming rescue requests in your area</p>
+          <p>Incoming rescue requests in your area</p>
         </div>
-        <div>
-          <label style="font-size:13px;color:var(--text2);display:flex;gap:6px;align-items:center;cursor:pointer"><input type="checkbox" id="nearby-only" style="width:auto" onchange="loadResponder()"> Nearby only (uses GPS)</label>
-          <div style="font-size:11px;color:var(--text3);margin-top:3px">Reports without GPS coordinates are hidden in this filter.</div>
+        <div class="responder-controls">
+          <div class="nearby-control">
+            <label for="nearby-only"><input type="checkbox" id="nearby-only" onchange="loadResponder()"> Nearby only</label>
+            <span class="nearby-help">Uses GPS; reports without coordinates are excluded.</span>
+          </div>
+          <label class="sr-only" for="resp-type">Responder type</label>
+          <select id="resp-type" onchange="setRespType(this.value)">
+            <option value="ngo">NGO</option>
+            <option value="vet">Veterinarian</option>
+            <option value="volunteer">Volunteer</option>
+          </select>
         </div>
-        <select id="resp-type" style="width:auto;padding:7px 14px;border-radius:20px;font-size:13px"
-          onchange="setRespType(this.value)">
-          <option value="ngo">NGO</option>
-          <option value="vet">Veterinarian</option>
-          <option value="volunteer">Volunteer</option>
-        </select>
-      </div>
+      </header>
 
-      <div class="grid4" style="margin-bottom:1.5rem">
-        <div class="stat">
+      <section class="grid4 responder-kpis" aria-label="Responder activity">
+        <div class="stat responder-kpi kpi-open">
+          <span class="responder-kpi-icon" aria-hidden="true">⌂</span>
           <div class="stat-n" id="rs-open">0</div>
           <div class="stat-l">Open</div>
         </div>
-        <div class="stat">
+        <div class="stat responder-kpi kpi-accepted">
+          <span class="responder-kpi-icon" aria-hidden="true">✓</span>
           <div class="stat-n" id="rs-accepted">0</div>
           <div class="stat-l">My Accepted</div>
         </div>
-        <div class="stat">
+        <div class="stat responder-kpi kpi-completed">
+          <span class="responder-kpi-icon" aria-hidden="true">♥</span>
           <div class="stat-n" id="rs-completed">0</div>
           <div class="stat-l">Completed</div>
         </div>
-        <div class="stat">
+        <div class="stat responder-kpi kpi-critical">
+          <span class="responder-kpi-icon" aria-hidden="true">!</span>
           <div class="stat-n" id="rs-critical">0</div>
           <div class="stat-l">Critical</div>
         </div>
-      </div>
+      </section>
 
-      <div class="card" style="margin-bottom:1rem">
-        <div class="card-title">Incoming Requests <span class="pulse"
-            style="color:var(--red);font-size:12px;font-weight:400">● LIVE</span></div>
+      <section class="card responder-section">
+        <div class="responder-section-heading">
+          <div>
+            <h3>Incoming requests</h3>
+            <p>Open cases available in the dispatch pool</p>
+          </div>
+          <div class="responder-feed-meta">
+            <span class="request-count" id="resp-request-count">0 available</span>
+            <span class="live-indicator"><span class="live-dot"></span> Live</span>
+          </div>
+        </div>
         <div id="resp-requests"></div>
-      </div>
-      <div class="card">
-        <div class="card-title">My Active Cases</div>
+      </section>
+      <section class="card responder-section">
+        <div class="responder-section-heading">
+          <div>
+            <h3>My active cases</h3>
+            <p>Cases you have accepted and are handling</p>
+          </div>
+        </div>
         <div id="resp-active"></div>
-      </div>
+      </section>
     </div>
   </div>
   <script src="../js/config.js"></script>

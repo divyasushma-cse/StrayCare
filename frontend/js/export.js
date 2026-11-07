@@ -2,14 +2,14 @@
 let expCat = null;
 const EXP_META = { weekly: ['📅', 'Weekly Report'], monthly: ['📆', 'Monthly Report'], analytics: ['📊', 'Analytics / Data'], donations: ['💳', 'Donations'], full: ['🗂️', 'Full Platform'] };
 const FORMAT_BTNS = {
-  csv: { label: '⬇️ Download CSV', bg: '#1D9E75' }, json: { label: '⬇️ Download JSON', bg: '#185FA5' },
-  pdf: { label: '🖨️ Export as PDF', bg: '#6B4FBB' }, ai: { label: '🤖 AI Analysis Prompt', bg: '#E24B4A' }
+  csv: { label: '⬇️ Download CSV', bg: '#167D68' }, json: { label: '⬇️ Download JSON', bg: '#3E7090' },
+  pdf: { label: '🖨️ Export as PDF', bg: '#5D4C97' }, ai: { label: '🤖 AI Analysis Prompt', bg: '#B95036' }
 };
 
 async function selectExportCat(cat, el) {
   expCat = cat;
   document.querySelectorAll('.exp-cat-card').forEach(c => { c.style.border = '2px solid var(--border)'; c.style.background = 'var(--bg)'; c.style.boxShadow = 'none'; });
-  el.style.border = '2px solid var(--g)'; el.style.background = 'var(--g3)'; el.style.boxShadow = '0 2px 12px rgba(29,158,117,0.15)';
+  el.style.border = '2px solid var(--g)'; el.style.background = 'var(--g3)'; el.style.boxShadow = '0 2px 12px rgba(22,125,104,0.15)';
   document.getElementById('exp-format-panel').style.display = 'block';
   try {
     const p = await api(`/admin/export/${cat}`);

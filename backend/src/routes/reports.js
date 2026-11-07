@@ -75,7 +75,7 @@ router.get('/mine', requireRole('user'), (req, res) => {
 
 // ---- Responder ----
 router.get('/open', requireRole('responder'), (req, res) => {
-  let rows = db.prepare(`${BASE} WHERE r.status = 'reported' ORDER BY (r.severity = 'critical') DESC, r.id DESC`).all();
+  let rows = db.prepare(`${BASE} WHERE r.status = 'reported' AND r.is_demo = 0 ORDER BY (r.severity = 'critical') DESC, r.created_at DESC, r.id DESC`).all();
   const lat = parseFloat(req.query.lat), lng = parseFloat(req.query.lng);
   if (req.query.nearby === '1' && !Number.isNaN(lat) && !Number.isNaN(lng)) rows = filterNearby(rows, lat, lng, haversineKm);
   res.json({ reports: rows.map(r => present(r)) });
@@ -89,10 +89,10 @@ router.get('/assigned', requireRole('responder'), (req, res) => {
 router.get('/responder-stats', requireRole('responder'), (req, res) => {
   const q = (sql, ...p) => db.prepare(sql).get(...p).n;
   res.json({
-    open: q("SELECT COUNT(*) n FROM reports WHERE status = 'reported'"),
+    open: q("SELECT COUNT(*) n FROM reports WHERE status = 'reported' AND is_demo = 0"),
     accepted: q('SELECT COUNT(*) n FROM reports WHERE responder_id = ?', req.user.id),
     completed: q("SELECT COUNT(*) n FROM reports WHERE responder_id = ? AND status = 'completed'", req.user.id),
-    critical: q("SELECT COUNT(*) n FROM reports WHERE status = 'reported' AND severity = 'critical'")
+    critical: q("SELECT COUNT(*) n FROM reports WHERE status = 'reported' AND severity = 'critical' AND is_demo = 0")
   });
 });
 

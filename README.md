@@ -55,7 +55,6 @@ cd StrayCare
 cd backend
 npm install
 ```
-
 ### 3. Configure local environment
 
 Create your local environment file from the example.
@@ -73,13 +72,15 @@ notepad .env
 cp .env.example .env
 ```
 
-Review `.env.example` and set your local values in `.env`. Keep `.env` private; never commit it or use example credentials in a deployment. Generate a strong JWT signing secret locally with:
+The fixed local-development admin login is **`superadmin` / `StrayCareAdmin$2026`**. Development always uses these credentials even if `ADMIN_USERNAME` or `ADMIN_PASSWORD` is set in `.env`; startup updates the local `superadmin` password to this default when needed. These are demo-only credentials.
+
+Review `.env.example` and set your local values in `.env`. Keep `.env` private; never commit it or use example credentials in a deployment. For production, set `NODE_ENV=production` and generate a strong JWT signing secret locally with:
 
 ```bash
 node -e "console.log(require('crypto').randomBytes(48).toString('base64url'))"
 ```
 
-Set that value as `JWT_SECRET`, and configure a unique `ADMIN_USERNAME` and an `ADMIN_PASSWORD` of at least 12 characters. Production startup rejects missing or placeholder credentials.
+Set that value as `JWT_SECRET`, and configure a unique `ADMIN_USERNAME` and an `ADMIN_PASSWORD` of at least 12 characters. Production startup rejects missing, default, placeholder, or too-short credentials. Demo seeding is explicitly disabled in production.
 
 ### 4. Seed local demo data and start the app
 
@@ -91,6 +92,8 @@ npm start
 Open [http://localhost:5000](http://localhost:5000).
 
 > **Local development only:** Demo seeding is refused in production. Do not run the seed script against production data.
+
+Seeded demo accounts (local development only): `user1/user123` · `vet1/vet123` · `ngo1/ngo123` · `vol1/vol123`; the initial admin uses the fixed local-development credentials above. Seeded sample accounts and reports are marked as **DEMO**. Demo reports stay available in admin and user history for testing, but are excluded from responder dispatch and public landing-page counts; new reports and accounts are treated as real.
 
 ## 🧪 Testing
 
@@ -110,6 +113,8 @@ npm run test:report-access
 npm run test:donations
 npm run test:report-coordinates
 npm run test:responder-lifecycle
+npm run test:demo-data
+npm run test:bootstrap
 ```
 
 The browser E2E flow is separate and requires Playwright plus a dedicated development server with demo data:
@@ -117,6 +122,10 @@ The browser E2E flow is separate and requires Playwright plus a dedicated develo
 ```bash
 node scripts/e2e.js
 ```
+
+## ⚙️ Production operations
+
+See [Production operations](docs/OPERATIONS.md) for deployment configuration, health checks, logs, backup scheduling, recovery drills, and accessibility release checks. Create a consistent SQLite database-and-uploads backup with `cd backend && npm run backup`; schedule backups and protect their contents.
 
 ## 🔒 Security and data integrity
 
@@ -162,3 +171,15 @@ Issues and improvements are welcome. For changes involving authentication, repor
 **Built to help communities care for animals in need. 🐾**
 
 </div>
+
+## What changed vs. the prototype
+
+- Passwords hashed (bcrypt), JWT sessions, server-enforced roles; pending/banned admins can no longer log in.
+- Radius expansion runs on the server (survives reloads; timings in `.env`).
+- Analytics, hero stats, exports and certificate PDFs are computed from the database (no hard-coded demo numbers).
+- Responders can filter to "Nearby only" (haversine distance vs. current radius).
+- Open dispatch requests prioritize critical cases, then show the newest reports first; administrators can review the oldest open cases without automatically closing them.
+- Admin KPIs count real active and resolved reports as separate states; the urgent queue excludes resolved and demo cases. The report list supports search, status/severity filters, pagination, and keyboard-friendly tabs.
+- Sign-in uses one accessible form for role, username, and password, with optional password visibility; it does not expose or autofill shared demo credentials.
+- Production operations include a database readiness health check, request-correlated structured error logs, graceful shutdown, and an SQLite backup command.
+- Photos are uploaded files (≤5 MB, images only); all user text is HTML-escaped.

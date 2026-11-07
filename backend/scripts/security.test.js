@@ -10,6 +10,45 @@ const validProductionConfig = {
   adminPassword: 'a-unique-admin-password-long-enough'
 };
 
+test('local development admin credentials stay fixed even if .env defines overrides', () => {
+  const env = { ...process.env, NODE_ENV: 'development', STRAYCARE_SKIP_DOTENV: '1' };
+  env.ADMIN_USERNAME = 'another-admin';
+  env.ADMIN_PASSWORD = 'another-local-password';
+  const result = spawnSync(process.execPath, ['-e', "const a=require('./src/config/env').admin;process.stdout.write(JSON.stringify(a))"], {
+    cwd: path.join(__dirname, '..'),
+    env,
+    encoding: 'utf8'
+  });
+  assert.equal(result.status, 0);
+  assert.deepEqual(JSON.parse(result.stdout), {
+    username: 'superadmin',
+    password: 'StrayCareAdmin$2026',
+    name: 'Chief Admin'
+  });
+});
+
+test('production admin credentials come from the production environment', () => {
+  const env = {
+    ...process.env,
+    NODE_ENV: 'production',
+    STRAYCARE_SKIP_DOTENV: '1',
+    JWT_SECRET: validProductionConfig.jwtSecret,
+    ADMIN_USERNAME: validProductionConfig.adminUsername,
+    ADMIN_PASSWORD: validProductionConfig.adminPassword
+  };
+  const result = spawnSync(process.execPath, ['-e', "const a=require('./src/config/env').admin;process.stdout.write(JSON.stringify(a))"], {
+    cwd: path.join(__dirname, '..'),
+    env,
+    encoding: 'utf8'
+  });
+  assert.equal(result.status, 0);
+  assert.deepEqual(JSON.parse(result.stdout), {
+    username: validProductionConfig.adminUsername,
+    password: validProductionConfig.adminPassword,
+    name: 'Chief Admin'
+  });
+});
+
 test('accepts unique production credentials', () => {
   assert.doesNotThrow(() => assertProductionConfig(validProductionConfig));
 });

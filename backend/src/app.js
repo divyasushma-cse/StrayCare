@@ -1,6 +1,7 @@
 const express = require('express');
 const path = require('path');
 const fs = require('fs');
+const crypto = require('crypto');
 const helmet = require('helmet');
 const cors = require('cors');
 const rateLimit = require('express-rate-limit');
@@ -11,6 +12,11 @@ fs.mkdirSync(env.uploadDir, { recursive: true });
 
 const app = express();
 app.disable('x-powered-by');
+app.use((req, res, next) => {
+  res.locals.requestId = crypto.randomUUID();
+  res.setHeader('X-Request-Id', res.locals.requestId);
+  next();
+});
 
 app.use(helmet({
   contentSecurityPolicy: {
@@ -39,7 +45,10 @@ app.use('/api/rewards', require('./routes/rewards'));
 app.use('/api/stats', require('./routes/stats'));
 app.use('/api/analytics', require('./routes/analytics'));
 app.use('/api/admin', require('./routes/admin'));
-app.get('/api/health', (req, res) => res.json({ ok: true }));
+app.get('/api/health', (req, res) => {
+  require('./db/database').prepare('SELECT 1').get();
+  res.json({ ok: true });
+});
 app.use('/api', notFound);
 
 app.use(express.static(env.frontendDir));

@@ -21,6 +21,17 @@ const ADMIN = { username: process.env.ADMIN_USERNAME || 'superadmin', password: 
   await u.click('text=Submit Rescue Report'); await u.waitForSelector('#my-reports-list .rcard');
   ok((await u.textContent('#my-reports-list')).includes('E2E injured dog'), 'user report appears in My Reports (XSS payload shown as text)');
   ok(await u.locator('#my-reports-list img[src="x"]').count() === 0, 'no injected <img> element');
+  const timelineButton = u.locator('#my-reports-list button').first();
+  await timelineButton.click();
+  ok(await u.locator('#modal-ov[role="dialog"][aria-modal="true"]').isVisible(), 'report timeline opens as an accessible dialog');
+  ok(await u.evaluate(() => document.activeElement.id === 'modal-box'), 'dialog receives focus when opened');
+  const modalClose = u.locator('.modal-close');
+  await modalClose.focus();
+  await u.keyboard.press('Tab');
+  ok(await u.evaluate(() => document.activeElement.matches('.modal-close')), 'dialog traps keyboard focus');
+  await u.keyboard.press('Escape');
+  ok(await u.locator('#modal-ov').getAttribute('aria-hidden') === 'true', 'Escape closes the dialog');
+  ok(await u.evaluate(() => document.activeElement.matches('#my-reports-list button')), 'closing dialog restores focus to its opener');
 
   // radius expands server-side
   await u.waitForTimeout(8500); await u.reload(); await u.click('text=My Reports');

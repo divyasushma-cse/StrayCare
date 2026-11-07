@@ -87,7 +87,7 @@ async function loadMyReports() {
       <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:8px">
         <div style="flex:1">
           <div class="rtitle">${esc(r.type)} — ${esc(r.code)}</div>
-          <div class="rmeta"><span class="badge b-${esc(r.severity)}">${esc(r.severity)}</span><span class="badge b-${esc(r.status)}">${statusLbl(r.status)}</span><span style="font-size:12px;color:var(--text3)">${timeAgo(r.ts)}</span></div>
+          <div class="rmeta"><span class="badge b-${esc(r.severity)}">${esc(r.severity)}</span><span class="badge b-${esc(r.status)}">${statusLbl(r.status)}</span>${r.isDemo ? '<span class="badge b-moderate demo-tag">DEMO DATA</span>' : ''}<span style="font-size:12px;color:var(--text3)">${timeAgo(r.ts)}</span></div>
           <div style="font-size:12px;color:var(--text2);margin-top:6px">📍 ${esc(r.loc)}</div>
           ${r.desc ? `<div style="font-size:13px;color:var(--text2);margin-top:4px">${esc(r.desc)}</div>` : ''}
           ${r.assignedTo ? `<div style="font-size:12px;color:var(--g);margin-top:6px;font-weight:500">✓ Assigned to: ${esc(r.assignedTo)}</div>` : ''}
@@ -139,7 +139,7 @@ function showUpiModal(amt, ngo, name) {
   const upiLink = `upi://pay?pa=${upiId}&pn=${encodeURIComponent(ngo)}&am=${amt}&cu=INR&tn=${encodeURIComponent('StrayCare Donation')}`;
   const qr = `https://api.qrserver.com/v1/create-qr-code/?size=140x140&data=${encodeURIComponent(upiLink)}`;
   openModal(`
-    <div class="modal-hdr"><h3 style="font-size:1.1rem">Complete Donation — &#8377;${esc(amt)}</h3><button class="modal-close" onclick="closeModal()">&#x2715;</button></div>
+    <div class="modal-hdr"><h3 id="modal-title" style="font-size:1.1rem">Complete Donation — &#8377;${esc(amt)}</h3><button class="modal-close" aria-label="Close dialog" onclick="closeModal()">&#x2715;</button></div>
     <div class="upi-box">
       <div style="font-size:13px;color:var(--text2);margin-bottom:1rem">Payment to: <strong>${esc(ngo)}</strong></div>
       <div style="font-size:12px;color:var(--amber-d);margin-bottom:1rem">Submitting confirmation creates a pending payment claim. StrayCare does not process or automatically verify payments; an admin must review external payment evidence.</div>
@@ -152,7 +152,7 @@ function showUpiModal(amt, ngo, name) {
       <button class="upi-confirm-btn" onclick="confirmDonation()">Submit payment claim for review</button>
     </div>`);
   const img = document.getElementById('upi-qr-img');
-  if (img) img.onerror = () => { document.getElementById('upi-qr-wrap').innerHTML = '<div style="font-size:12px;color:#6B6A65;text-align:center;padding:10px">QR unavailable<br>Use UPI ID below</div>'; };
+  if (img) img.onerror = () => { document.getElementById('upi-qr-wrap').innerHTML = '<div style="font-size:12px;color:var(--text2);text-align:center;padding:10px">QR unavailable<br>Use UPI ID below</div>'; };
 }
 async function confirmDonation() {
   if (!pendingDonation) return;

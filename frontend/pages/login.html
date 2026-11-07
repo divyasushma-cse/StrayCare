@@ -6,29 +6,34 @@
   <link rel="stylesheet" href="../css/style.css"><link rel="stylesheet" href="../css/auth.css"><link rel="stylesheet" href="../css/responsive.css">
 </head><body>
   <div id="auth-overlay"><div class="auth-box">
-    <div class="auth-header"><div class="brand" onclick="location.href='home.html'" style="cursor:pointer">Stray<em>Care</em></div><p>Rescue. Heal. Protect.</p></div>
+    <div class="auth-header"><a class="brand auth-brand-link" href="home.html">Stray<em>Care</em></a><p>Rescue. Heal. Protect.</p></div>
     <div class="auth-body">
-      <div id="auth-step1">
-        <div class="auth-title">Welcome</div><div class="auth-sub">Select your role to get started</div>
-        <div class="role-grid">
-          <div class="role-opt" data-role="user" onclick="selectRole(this)"><div class="role-icon">🙋</div><div class="role-name">User</div><div class="role-hint">Report animals</div></div>
-          <div class="role-opt" data-role="responder" onclick="selectRole(this)"><div class="role-icon">🏥</div><div class="role-name">Responder</div><div class="role-hint">Vet / NGO / Volunteer</div></div>
-          <div class="role-opt" data-role="admin" onclick="selectRole(this)"><div class="role-icon">⚙️</div><div class="role-name">Admin</div><div class="role-hint">Website management</div></div>
+      <div class="auth-title">Welcome back</div>
+      <div class="auth-sub">Sign in to report, respond, or manage rescue cases.</div>
+      <div class="auth-err" id="auth-err-login" role="alert" aria-live="assertive"></div>
+      <form id="login-form" onsubmit="event.preventDefault();doLogin()">
+        <div class="fgroup">
+          <label class="flabel" for="auth-role">I am signing in as</label>
+          <select id="auth-role" class="auth-role-select" required>
+            <option value="">Choose your role</option>
+            <option value="user">Community member</option>
+            <option value="responder">Rescue responder</option>
+            <option value="admin">Administrator</option>
+          </select>
         </div>
-        <div class="auth-err" id="auth-err-role">Please select a role to continue.</div>
-        <button class="btn btn-primary btn-block" onclick="proceedToLogin()">Continue →</button>
-        <button class="btn btn-ghost btn-block" style="margin-top:8px;font-size:13px" onclick="location.href='home.html'">← Back to Home</button>
-      </div>
-      <div id="auth-step2" style="display:none">
-        <div class="auth-title" id="auth-step2-title">Sign In</div><div class="auth-sub" id="auth-step2-sub"></div>
-        <div class="auth-err" id="auth-err-login"></div>
-        <div class="fgroup"><label class="flabel">Username</label><input type="text" id="auth-username" placeholder="Enter your username" autocomplete="username"></div>
-        <div class="fgroup"><label class="flabel">Password</label><input type="password" id="auth-password" placeholder="Enter your password" autocomplete="current-password" onkeydown="if(event.key==='Enter')doLogin()"></div>
-        <button class="btn btn-primary btn-block" id="login-btn" onclick="doLogin()">Sign In →</button>
-        <div class="auth-divider">or</div>
-        <button class="btn btn-ghost btn-block" onclick="goSignup()">✏️ Create New Account</button>
-        <button class="btn btn-ghost btn-block" style="margin-top:8px;font-size:13px" onclick="backToRoles()">← Change Role</button>
-      </div>
+        <div class="fgroup"><label class="flabel" for="auth-username">Username</label><input type="text" id="auth-username" placeholder="Enter your username" autocomplete="username" required></div>
+        <div class="fgroup">
+          <label class="flabel" for="auth-password">Password</label>
+          <div class="auth-password-row">
+            <input type="password" id="auth-password" placeholder="Enter your password" autocomplete="current-password" required>
+            <button type="button" class="auth-password-toggle" id="auth-password-toggle" aria-pressed="false" onclick="toggleLoginPassword()">Show</button>
+          </div>
+        </div>
+        <button class="btn btn-primary btn-block" id="login-btn" type="submit">Sign In →</button>
+      </form>
+      <div class="auth-divider">New to StrayCare?</div>
+      <a class="btn btn-ghost btn-block auth-create-link" href="signup.html" onclick="goSignup();return false;">Create an account</a>
+      <a class="auth-home-link" href="home.html">← Back to home</a>
     </div>
   </div></div>
   <div id="notif"><div class="notif-inner" id="notif-inner"></div></div>

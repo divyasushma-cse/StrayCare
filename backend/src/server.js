@@ -14,6 +14,32 @@ function startServer(port = env.port) {
   return server;
 }
 
-if (require.main === module) startServer();
+if (require.main === module) {
+  const server = startServer();
+  const db = require('./db/database');
+  let shuttingDown = false;
+  const shutdown = signal => {
+    if (shuttingDown) return;
+    shuttingDown = true;
+    console.log(JSON.stringify({ level: 'info', event: 'shutdown', signal }));
+    scheduler.stop();
+    const timeout = setTimeout(() => {
+      server.closeAllConnections?.();
+      db.close();
+      process.exit(1);
+    }, 10000);
+    timeout.unref();
+    server.close(error => {
+      clearTimeout(timeout);
+      if (error) {
+        console.error(error);
+        process.exitCode = 1;
+      }
+      db.close();
+    });
+  };
+  process.on('SIGINT', () => shutdown('SIGINT'));
+  process.on('SIGTERM', () => shutdown('SIGTERM'));
+}
 
 module.exports = { startServer };

@@ -5,9 +5,11 @@ if (process.env.STRAYCARE_SKIP_DOTENV !== '1') {
 const { assertProductionConfig } = require('./security');
 
 const num = (v, d) => (v !== undefined && v !== '' && !Number.isNaN(Number(v)) ? Number(v) : d);
+const nodeEnv = (process.env.NODE_ENV || 'development').trim().toLowerCase();
+const localAdmin = { username: 'superadmin', password: 'StrayCareAdmin$2026' };
 
 const env = {
-  nodeEnv: (process.env.NODE_ENV || 'development').trim().toLowerCase(),
+  nodeEnv,
   port: num(process.env.PORT, 5000),
   jwtSecret: process.env.JWT_SECRET || 'dev-only-secret-change-me',
   jwtExpires: process.env.JWT_EXPIRES || '7d',
@@ -21,8 +23,8 @@ const env = {
     mild: num(process.env.EXPAND_MILD_SECONDS, 17)
   },
   admin: {
-    username: process.env.ADMIN_USERNAME || 'superadmin',
-    password: process.env.ADMIN_PASSWORD || 'StrayCareAdmin$2026',
+    username: nodeEnv === 'development' ? localAdmin.username : (process.env.ADMIN_USERNAME || localAdmin.username),
+    password: nodeEnv === 'development' ? localAdmin.password : (process.env.ADMIN_PASSWORD || localAdmin.password),
     name: process.env.ADMIN_NAME || 'Chief Admin'
   }
 };

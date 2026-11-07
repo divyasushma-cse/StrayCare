@@ -3,7 +3,7 @@
       position: fixed;
       inset: 0;
       z-index: 9999;
-      background: rgba(8, 80, 65, 0.92);
+      background: rgba(18, 63, 53, 0.94);
       backdrop-filter: blur(8px);
       display: flex;
       align-items: center;
@@ -11,6 +11,57 @@
       padding: 1.5rem;
     }
 
+    .auth-role-select {
+      width: 100%;
+      min-height: 44px;
+      padding: 9px 12px;
+      border: 1px solid var(--border2);
+      border-radius: 8px;
+      background: #fff;
+      color: var(--text);
+      font-size: 14px;
+    }
+
+    .auth-password-row {
+      display: flex;
+      align-items: stretch;
+    }
+
+    .auth-password-row input {
+      flex: 1;
+      min-width: 0;
+      border-radius: 8px 0 0 8px;
+    }
+
+    .auth-password-toggle {
+      min-width: 58px;
+      border: 1px solid var(--border2);
+      border-left: 0;
+      border-radius: 0 8px 8px 0;
+      background: var(--bg);
+      color: var(--g2);
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    .auth-create-link {
+      display: block;
+      text-align: center;
+      text-decoration: none;
+    }
+
+    .auth-home-link {
+      display: block;
+      margin-top: 1rem;
+      color: var(--text2);
+      font-size: 13px;
+      text-align: center;
+    }
+
+    .auth-home-link:hover {
+      color: var(--g2);
+    }
     #auth-overlay.hidden {
       display: none
     }
@@ -20,7 +71,7 @@
       border-radius: 18px;
       width: 100%;
       max-width: 420px;
-      box-shadow: 0 24px 60px rgba(0, 0, 0, 0.3);
+      box-shadow: 0 24px 60px rgba(8, 36, 29, 0.32);
       overflow: hidden;
       animation: authIn 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
     }
@@ -46,6 +97,11 @@
     .auth-header .brand {
       font-size: 1.8rem;
       cursor: default
+    }
+
+    .auth-brand-link {
+      display: inline-block;
+      text-decoration: none;
     }
 
     .auth-header p {

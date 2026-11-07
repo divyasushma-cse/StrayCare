@@ -8,13 +8,13 @@ const db = require('../src/db/database');
 const { RADII, POINTS } = require('../src/utils/constants');
 
 const users = [
-  ['user1', 'user123', 'Priya S.', 'user'], ['user2', 'user456', 'Arjun M.', 'user'], ['guest', 'guest', 'Guest User', 'user'],
-  ['vet1', 'vet123', 'Dr. Meena (Vet)', 'responder', 'vet'], ['ngo1', 'ngo123', 'Blue Cross NGO', 'responder', 'ngo'],
-  ['ngo2', 'ngo456', 'CARE Rescue Team', 'responder', 'ngo'], ['vol1', 'vol123', 'Volunteer Raju', 'responder', 'volunteer'],
-  [env.admin.username, env.admin.password, env.admin.name, 'admin'], ['systemop', 'OpSecure#99', 'Operations Admin', 'admin']
+  ['user1', 'user123', 'Priya S.', 'user', null, 1], ['user2', 'user456', 'Arjun M.', 'user', null, 1], ['guest', 'guest', 'Guest User', 'user', null, 1],
+  ['vet1', 'vet123', 'Dr. Meena (Vet)', 'responder', 'vet', 1], ['ngo1', 'ngo123', 'Blue Cross NGO', 'responder', 'ngo', 1],
+  ['ngo2', 'ngo456', 'CARE Rescue Team', 'responder', 'ngo', 1], ['vol1', 'vol123', 'Volunteer Raju', 'responder', 'volunteer', 1],
+  [env.admin.username, env.admin.password, env.admin.name, 'admin', null, 0], ['systemop', 'OpSecure#99', 'Operations Admin', 'admin', null, 1]
 ];
-const ins = db.prepare('INSERT OR IGNORE INTO users (username,password_hash,name,role,responder_type,points) VALUES (?,?,?,?,?,?)');
-users.forEach(([u, p, n, r, t]) => ins.run(u, bcrypt.hashSync(p, 10), n, r, t || null, u === 'user1' ? 120 : 0));
+const ins = db.prepare('INSERT OR IGNORE INTO users (username,password_hash,name,role,responder_type,points,is_demo) VALUES (?,?,?,?,?,?,?)');
+users.forEach(([u, p, n, r, t, isDemo]) => ins.run(u, bcrypt.hashSync(p, 10), n, r, t || null, u === 'user1' ? 120 : 0, isDemo));
 const id = u => db.prepare('SELECT id FROM users WHERE username=?').get(u).id;
 
 if (db.prepare('SELECT COUNT(*) n FROM reports').get().n === 0) {
@@ -23,8 +23,8 @@ if (db.prepare('SELECT COUNT(*) n FROM reports').get().n === 0) {
   const animals = ['Dog', 'Dog', 'Dog', 'Cat', 'Cat', 'Bird', 'Cow', 'Horse', 'Other'];
   const places = ['T. Nagar, Chennai', 'Adyar Signal', 'Anna Nagar West', 'Velachery Main Rd', 'Mylapore Tank', 'Besant Nagar Beach'];
   const resp = [['vet1', 'vet'], ['ngo1', 'ngo'], ['ngo2', 'ngo'], ['vol1', 'volunteer']];
-  const insR = db.prepare(`INSERT INTO reports (reporter_id,animal_type,severity,description,location,lat,lng,status,radius_level,radius_km,assigned_to,responder_id,responder_type,pts_value,points_awarded,accepted_at,rescued_at,created_at,updated_at)
-    VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,1,?,?,?,?)`);
+  const insR = db.prepare(`INSERT INTO reports (reporter_id,animal_type,severity,description,location,lat,lng,status,radius_level,radius_km,assigned_to,responder_id,responder_type,pts_value,points_awarded,accepted_at,rescued_at,created_at,updated_at,is_demo)
+    VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,1,?,?,?,?,1)`);
   const reporters = [id('user1'), id('user2'), id('guest')];
   const monthly = [[38, 8, 30], [52, 12, 41], [61, 14, 48], [44, 9, 35], [70, 16, 55], [83, 19, 66], [67, 15, 52], [91, 21, 74], [78, 18, 61], [105, 24, 88], [89, 20, 71], [118, 28, 95]];
   const now = new Date();
@@ -52,7 +52,7 @@ if (db.prepare('SELECT COUNT(*) n FROM reports').get().n === 0) {
     [['Dog', 'critical', 'Hit by vehicle near the signal, bleeding from hind leg. Cannot walk.', 'Adyar Signal, Chennai'],
      ['Cat', 'moderate', 'Kitten with injured eye, hiding under parked car.', 'T. Nagar Bus Stand'],
      ['Cow', 'mild', 'Stray cow wandering on the highway shoulder, looks healthy.', 'ECR Main Road']].forEach(([t, s, d, l]) => {
-      const r = db.prepare(`INSERT INTO reports (reporter_id,animal_type,severity,description,location,lat,lng,radius_km,pts_value,created_at,updated_at) VALUES (?,?,?,?,?,?,?,?,?,?,?)`)
+      const r = db.prepare(`INSERT INTO reports (reporter_id,animal_type,severity,description,location,lat,lng,radius_km,pts_value,created_at,updated_at,is_demo) VALUES (?,?,?,?,?,?,?,?,?,?,?,1)`)
         .run(id('user1'), t, s, d, l, 13.0827, 80.2707, RADII[s][0], POINTS[s], iso, iso);
       db.prepare("INSERT INTO report_events (report_id,title,note,created_at) VALUES (?,?,?,?)").run(r.lastInsertRowid, 'Reported', 'Report submitted by Priya S.', iso);
     });

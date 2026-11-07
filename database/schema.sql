@@ -8,6 +8,7 @@ CREATE TABLE IF NOT EXISTS users (
   password_hash  TEXT    NOT NULL,
   name           TEXT    NOT NULL,
   role           TEXT    NOT NULL CHECK (role IN ('user','responder','admin')),
+  is_demo        INTEGER NOT NULL DEFAULT 0 CHECK (is_demo IN (0,1)),
   status         TEXT    NOT NULL DEFAULT 'active' CHECK (status IN ('active','pending','banned')),
   responder_type TEXT             CHECK (responder_type IN ('ngo','vet','volunteer')),
   points         INTEGER NOT NULL DEFAULT 0,
@@ -32,6 +33,7 @@ CREATE TABLE IF NOT EXISTS reports (
   assigned_to        TEXT,
   responder_id       INTEGER REFERENCES users(id) ON DELETE SET NULL,
   responder_type     TEXT,                       -- ngo | vet | volunteer | admin
+  is_demo            INTEGER NOT NULL DEFAULT 0 CHECK (is_demo IN (0,1)),
   pts_value          INTEGER NOT NULL DEFAULT 0, -- points the reporter earns on rescue
   points_awarded     INTEGER NOT NULL DEFAULT 0, -- 1 once points were paid (prevents double award)
   accepted_at        TEXT,

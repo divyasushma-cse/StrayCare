@@ -6,6 +6,44 @@ function migrateDonationVerification(db) {
   }
 }
 
+function migrateDemoReports(db) {
+  const columns = db.prepare('PRAGMA table_info(reports)').all().map(column => column.name);
+  if (!columns.includes('is_demo')) {
+    db.exec('ALTER TABLE reports ADD COLUMN is_demo INTEGER NOT NULL DEFAULT 0 CHECK (is_demo IN (0,1))');
+  }
+  const userColumns = db.prepare('PRAGMA table_info(users)').all().map(column => column.name);
+  if (!userColumns.includes('is_demo')) {
+    db.exec('ALTER TABLE users ADD COLUMN is_demo INTEGER NOT NULL DEFAULT 0 CHECK (is_demo IN (0,1))');
+  }
+  db.prepare(`UPDATE users SET is_demo = 1 WHERE
+    (username = 'user1' AND name = 'Priya S.' AND role = 'user')
+    OR (username = 'user2' AND name = 'Arjun M.' AND role = 'user')
+    OR (username = 'guest' AND name = 'Guest User' AND role = 'user')
+    OR (username = 'vet1' AND name = 'Dr. Meena (Vet)' AND role = 'responder')
+    OR (username = 'ngo1' AND name = 'Blue Cross NGO' AND role = 'responder')
+    OR (username = 'ngo2' AND name = 'CARE Rescue Team' AND role = 'responder')
+    OR (username = 'vol1' AND name = 'Volunteer Raju' AND role = 'responder')
+    OR (username = 'systemop' AND name = 'Operations Admin' AND role = 'admin')`).run();
+
+  db.prepare(`UPDATE reports SET is_demo = 1
+    WHERE description = 'Demo history record for analytics.'
+      OR EXISTS (
+        SELECT 1 FROM users u
+        WHERE u.id = reports.reporter_id AND u.username = 'user1'
+          AND (
+            (reports.animal_type = 'Dog' AND reports.severity = 'critical'
+              AND reports.description = 'Hit by vehicle near the signal, bleeding from hind leg. Cannot walk.'
+              AND reports.location = 'Adyar Signal, Chennai')
+            OR (reports.animal_type = 'Cat' AND reports.severity = 'moderate'
+              AND reports.description = 'Kitten with injured eye, hiding under parked car.'
+              AND reports.location = 'T. Nagar Bus Stand')
+            OR (reports.animal_type = 'Cow' AND reports.severity = 'mild'
+              AND reports.description = 'Stray cow wandering on the highway shoulder, looks healthy.'
+              AND reports.location = 'ECR Main Road')
+          )
+      )`).run();
+}
+
 function migrateReportCoordinates(db) {
   const columns = db.prepare('PRAGMA table_info(reports)').all();
   const lat = columns.find(column => column.name === 'lat');
@@ -60,4 +98,4 @@ function migrateReportCoordinates(db) {
   }
 }
 
-module.exports = { migrateDonationVerification, migrateReportCoordinates };
+module.exports = { migrateDonationVerification, migrateDemoReports, migrateReportCoordinates };

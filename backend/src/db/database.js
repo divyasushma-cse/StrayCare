@@ -12,6 +12,7 @@ const schema = fs.readFileSync(path.join(__dirname, '..', '..', '..', 'database'
 db.exec(schema);
 const migrations = require('./migrations');
 migrations.migrateReportCoordinates(db);
+migrations.migrateDemoReports(db);
 migrations.migrateDonationVerification(db);
 
 module.exports = db;

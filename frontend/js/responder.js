@@ -26,33 +26,41 @@ async function loadResponder() {
   document.getElementById('rs-critical').textContent = stats.critical;
 
   const reqEl = document.getElementById('resp-requests');
+  document.getElementById('resp-request-count').textContent = `${open.reports.length} available`;
   reqEl.innerHTML = !open.reports.length
-    ? `<p style="color:var(--text2);text-align:center;padding:1.5rem;font-size:13px">No open requests nearby. Stay alert!</p>`
+    ? `<div class="responder-empty"><span aria-hidden="true">🐾</span><strong>All clear for now</strong><p>No open requests nearby. Stay alert!</p></div>`
     : open.reports.map(r => `
-    <div class="req-card ${r.severity === 'critical' ? 'crit-req' : ''}" style="margin-bottom:0.75rem">
-      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;flex-wrap:wrap;gap:6px">
-        <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap"><span style="font-weight:600;font-family:'Playfair Display',serif">${esc(r.type)}</span><span class="badge b-${esc(r.severity)}">${esc(r.severity)}</span>
-          ${r.severity === 'critical' ? `<span class="badge b-critical pulse">🚨 PRIORITY</span>` : ''}</div>
-        <span style="font-size:12px;color:var(--coral);font-weight:500">~${r.radiusKm}km radius${r.distanceKm !== undefined ? ` · ${r.distanceKm}km away` : ''}</span>
+    <article class="req-card ${r.severity === 'critical' ? 'crit-req' : esc(r.severity)}">
+      <div class="req-card-top">
+        <div class="req-card-title">
+          <span class="req-animal-icon" aria-hidden="true">🐾</span>
+          <div><h4>${esc(r.type)} needs help</h4></div>
+        </div>
+        <span class="req-radius">${r.distanceKm !== undefined ? `${r.distanceKm} km away` : `${r.radiusKm} km search radius`}</span>
       </div>
-      <div style="font-size:13px;color:var(--text2);margin-bottom:4px">📍 ${esc(r.loc)}</div>
-      ${r.hasCoordinates === false ? '<div style="font-size:11px;color:var(--text3);margin-bottom:6px">No GPS coordinates — not included in Nearby-only results</div>' : ''}
-      ${r.desc ? `<div style="font-size:13px;color:var(--text2);margin-bottom:8px">${esc(r.desc)}</div>` : ''}
-      <div style="display:flex;align-items:center;justify-content:space-between"><span style="font-size:12px;color:var(--text3)">${timeAgo(r.ts)}</span><button class="btn btn-primary btn-sm" onclick="acceptCase(${Number(r.id)})">✓ Accept</button></div>
-    </div>`).join('');
+      <div class="req-card-badges">
+        <span class="badge b-${esc(r.severity)}">${esc(r.severity)}</span>
+        ${r.severity === 'critical' ? `<span class="badge b-critical req-priority">🚨 Priority</span>` : ''}
+        <span class="req-age">Reported ${timeAgo(r.ts)}</span>
+      </div>
+      <div class="req-location">📍 ${esc(r.loc)}</div>
+      ${r.hasCoordinates === false ? '<div class="req-no-gps">No GPS coordinates — excluded from Nearby-only results</div>' : ''}
+      ${r.desc ? `<p class="req-description">${esc(r.desc)}</p>` : ''}
+      <div class="req-card-footer"><span class="req-updated">Case ${esc(r.code)}</span><button class="btn btn-primary btn-sm" onclick="acceptCase(${Number(r.id)})">✓ Accept case</button></div>
+    </article>`).join('');
 
   document.getElementById('resp-active').innerHTML = !active.reports.length
-    ? `<p style="color:var(--text2);font-size:13px;padding:0.5rem 0">No active cases</p>`
+    ? `<div class="responder-empty responder-empty-small"><span aria-hidden="true">✨</span><strong>No active cases</strong><p>Accept an incoming request to start helping.</p></div>`
     : active.reports.map(r => `
-    <div style="background:var(--bg);border-radius:10px;padding:1rem;margin-bottom:0.75rem">
-      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;flex-wrap:wrap;gap:6px"><span style="font-weight:500;font-family:'Playfair Display',serif">${esc(r.type)} — ${esc(r.code)}</span><span class="badge b-${esc(r.status)}">${statusLbl(r.status)}</span></div>
-      <div style="font-size:12px;color:var(--text2);margin-bottom:10px">📍 ${esc(r.loc)}</div>
-      <div style="display:flex;gap:8px;flex-wrap:wrap">
+    <article class="responder-active-card">
+      <div class="responder-active-heading"><span class="responder-active-title">${esc(r.type)} — ${esc(r.code)}</span><span class="badge b-${esc(r.status)}">${statusLbl(r.status)}</span></div>
+      <div class="req-location">📍 ${esc(r.loc)}</div>
+      <div class="responder-active-actions">
         ${r.status === 'accepted' ? `<button class="btn btn-ghost btn-sm" onclick="updateStatus(${r.id},'onway')">🚗 On the Way</button> <button class="btn btn-danger btn-sm" onclick="dropCase(${r.id})">Drop Case</button>` : ''}
         ${r.status === 'onway' ? `<button class="btn btn-primary btn-sm" onclick="updateStatus(${r.id},'rescued')">🐾 Mark Rescued</button>` : ''}
         ${r.status === 'rescued' ? `<button class="btn btn-ghost btn-sm" onclick="updateStatus(${r.id},'completed')">✅ Completed</button>` : ''}
         <button class="btn btn-ghost btn-sm" onclick="showTimeline(${Number(r.id)})">📋 Timeline</button>
-      </div></div>`).join('');
+      </div></article>`).join('');
 }
 
 async function act(path, body, okMsg) {

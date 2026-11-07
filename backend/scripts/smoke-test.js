@@ -27,12 +27,59 @@ async function runSmokeTest() {
   const resp = (await login('ngo1', 'ngo123', 'responder')).data.token;
   const admin = (await login(ADMIN.username, ADMIN.password, 'admin')).data.token;
   check('admin login', !!admin);
+  const health = await call('GET', '/api/health', { raw: true });
+  check('health endpoint confirms database readiness', health.status === 200 && (await health.json()).ok === true && !!health.headers.get('x-request-id'));
   check('no token => 401', (await call('GET', '/api/reports/mine')).status === 401);
   check('user cannot open admin API', (await call('GET', '/api/admin/summary', { token: user })).status === 403);
   check('responder cannot submit report', (await call('POST', '/api/reports', { token: resp, body: {} })).status === 403);
-
+  const demoMine = await call('GET', '/api/reports/mine', { token: user });
+  check('seeded reports are explicitly marked as demo', demoMine.data.reports.length > 0 && demoMine.data.reports.every(report => report.isDemo));
+  check('demo reports are excluded from responder dispatch', (await call('GET', '/api/reports/open', { token: resp })).data.reports.every(report => !report.isDemo));
+  const publicStats = await call('GET', '/api/stats/public');
+  check('public counters exclude seeded demo reports and responders', publicStats.data.rescued === 0 && publicStats.data.reportsToday === 0 && publicStats.data.responders === 0, publicStats.data);
+  const adminSummary = await call('GET', '/api/admin/summary', { token: admin });
+  check('admin summary identifies seeded demo reports', adminSummary.data.demoReports > 0, adminSummary.data.demoReports);
   const lifecycleDb = require('../src/db/database');
+  const expectedMetrics = {
+    total: lifecycleDb.prepare('SELECT COUNT(*) n FROM reports WHERE is_demo = 0').get().n,
+    active: lifecycleDb.prepare("SELECT COUNT(*) n FROM reports WHERE is_demo = 0 AND status IN ('reported','accepted','onway')").get().n,
+    rescued: lifecycleDb.prepare("SELECT COUNT(*) n FROM reports WHERE is_demo = 0 AND status IN ('rescued','completed')").get().n,
+    critical: lifecycleDb.prepare("SELECT COUNT(*) n FROM reports WHERE is_demo = 0 AND severity = 'critical' AND status IN ('reported','accepted','onway')").get().n
+  };
+  check('admin KPIs count real reports without overlapping active and resolved states', ['total', 'active', 'rescued', 'critical'].every(key => adminSummary.data[key] === expectedMetrics[key]), { actual: adminSummary.data, expected: expectedMetrics });
+  const oneReportPage = await call('GET', '/api/admin/reports?page=1&limit=1', { token: admin });
+  const nextReportPage = await call('GET', '/api/admin/reports?page=2&limit=1', { token: admin });
+  check('admin report list paginates without repeating rows', oneReportPage.data.reports.length === 1 && nextReportPage.data.reports.length === 1 && oneReportPage.data.reports[0].id !== nextReportPage.data.reports[0].id && oneReportPage.data.hasMore);
+  const urgentReports = await call('GET', '/api/admin/reports?page=1&limit=8&severity=critical&status=active&realOnly=1', { token: admin });
+  check('urgent critical queue contains only real active critical reports', urgentReports.data.reports.every(report => !report.isDemo && report.severity === 'critical' && ['reported', 'accepted', 'onway'].includes(report.status)));
+  const filteredDemos = await call('GET', '/api/admin/reports?page=1&limit=5&q=Demo&status=active&severity=critical', { token: admin });
+  check('report search and combined status/severity filters return matching records', filteredDemos.data.reports.length > 0 && filteredDemos.data.reports.every(report => report.isDemo && report.severity === 'critical' && ['reported', 'accepted', 'onway'].includes(report.status)));
+  const searchByCaseCode = await call('GET', '/api/admin/reports?page=1&limit=5&q=SC-899', { token: admin });
+  check('report search recognizes the displayed SC case code', searchByCaseCode.data.reports.some(report => report.code === 'SC-899'));
+  check('admin report filters reject invalid status', (await call('GET', '/api/admin/reports?page=1&status=unknown', { token: admin })).status === 400);
+  check('admin report pagination rejects excessive page size', (await call('GET', '/api/admin/reports?page=1&limit=101', { token: admin })).status === 400);
+  check('admin report pagination rejects unsafe page offsets', (await call('GET', '/api/admin/reports?page=9007199254740991&limit=100', { token: admin })).status === 400);
+  const adminReports = await call('GET', '/api/admin/reports', { token: admin });
+  check('admin report records expose demo provenance', adminReports.data.reports.some(report => report.isDemo));
+  const adminUsers = await call('GET', '/api/admin/users', { token: admin });
+  check('admin user records expose demo provenance', adminUsers.data.users.some(account => account.isDemo));
+
   const reporterId = lifecycleDb.prepare('SELECT id FROM users WHERE username = ?').get('user1').id;
+  const freshnessInsert = lifecycleDb.prepare(`INSERT INTO reports
+    (reporter_id, animal_type, severity, description, location, lat, lng, status, radius_km, created_at, updated_at)
+    VALUES (?, 'Dog', 'mild', 'Dispatch freshness ordering smoke case', 'Freshness test street', NULL, NULL, 'reported', 5, ?, ?)`);
+  const olderDispatchId = Number(freshnessInsert.run(reporterId, '2024-01-01T00:00:00.000Z', '2024-01-01T00:00:00.000Z').lastInsertRowid);
+  const newerDispatchId = Number(freshnessInsert.run(reporterId, '2025-01-01T00:00:00.000Z', '2025-01-01T00:00:00.000Z').lastInsertRowid);
+  const orderedOpen = await call('GET', '/api/reports/open', { token: resp });
+  const olderPosition = orderedOpen.data.reports.findIndex(report => report.id === olderDispatchId);
+  const newerPosition = orderedOpen.data.reports.findIndex(report => report.id === newerDispatchId);
+  check('open dispatch orders newer cases first within severity', newerPosition >= 0 && olderPosition > newerPosition, { newerPosition, olderPosition });
+  const oldestReview = await call('GET', '/api/admin/reports/oldest-open', { token: admin });
+  const reviewOlderPosition = oldestReview.data.reports.findIndex(report => report.id === olderDispatchId);
+  const reviewNewerPosition = oldestReview.data.reports.findIndex(report => report.id === newerDispatchId);
+  check('admin oldest-open review lists oldest cases first', reviewOlderPosition >= 0 && reviewNewerPosition > reviewOlderPosition);
+  check('oldest-open review is admin-only', (await call('GET', '/api/admin/reports/oldest-open', { token: resp })).status === 403);
+
   const createResponderCases = responderId => {
     const insert = lifecycleDb.prepare(`INSERT INTO reports
       (reporter_id, animal_type, severity, description, location, lat, lng, status, radius_km,
@@ -93,6 +140,7 @@ async function runSmokeTest() {
   form.append('photo', new Blob([Buffer.from('89504e470d0a1a0a', 'hex')], { type: 'image/png' }), 'x.png');
   r = await call('POST', '/api/reports', { token: user, form });
   check('create report with photo', r.status === 201 && r.data.report.code.startsWith('SC-') && r.data.report.photo === `/api/reports/${r.data.report.id}/photo` && r.data.pointsOnRescue === 30, r.data);
+  check('newly submitted report is not marked as demo', r.data.report.isDemo === false, r.data.report.isDemo);
   const id = r.data.report.id;
   const photo = await call('GET', r.data.report.photo, { token: user, raw: true });
   check('report owner can fetch protected photo', photo.status === 200 && photo.headers.get('content-type').startsWith('image/'));
